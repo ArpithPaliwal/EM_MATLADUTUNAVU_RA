@@ -9,7 +9,7 @@ let channel: Channel | null = null;
 export async function connectRabbitMQ(): Promise<Channel> {
   if (channel) return channel;
 
-  const rabbitUrl = process.env.RABBIT_URL;
+  const rabbitUrl = process.env.RABBITMQ_URL;
   if (!rabbitUrl) {
     throw new Error("RABBIT_URL is not defined");
   }
