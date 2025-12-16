@@ -1,20 +1,37 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IUser extends Document {
-    name: string;
+    username: string;
     email: string;
+    password:string;
+    avatar:string;
+    refreshToken:string;
 }
 
 const schema: Schema<IUser> = new Schema(
     {
-        name: {
+        username: {
             type: String,
-            required: true
+            required: true,
+            unique:true,
         },
         email: {
             type: String,
             required: true,
             unique: true,
+        },
+        password:{
+            type:String,
+            required:[true,"password is required"]
+        },
+        avatar:{
+            type:String, //cloudinary
+            
+            
+        },
+        refreshToken:{
+            type:String,
+
         }
     },
     { timestamps: true }

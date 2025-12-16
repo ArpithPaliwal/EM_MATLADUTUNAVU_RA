@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
@@ -6,6 +9,12 @@ interface CloudinaryUploadResult {
   public_id: string;
   resource_type: "image" | "video" | "raw" | "auto";
 }
+
+
+
+
+
+
 
 const uploadOnCloudinary = async (
   localFilePath: string
