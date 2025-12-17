@@ -4,5 +4,6 @@ import { AuthController } from "../controllers/auth.controller.js";
 const router = Router();
 const authController = new AuthController();
 
-router.route("/signup").post(upload.single("avatar"),authController.signup)
+router.route("/signupInitialize").post(upload.single("avatar"),authController.signupInitiate);
+router.route("/signupVerifyCode").post(authController.signupVerifyCode);
 export default router;

@@ -36,7 +36,7 @@ export class AuthController implements IAuthController {
 
     const result = await this.authService.signupVerifyCode(email, otp);
 
-    // 1️⃣ Set tokens in cookies
+    
     res.cookie("accessToken", result.accessToken, {
       httpOnly: true,
       secure: true,          
