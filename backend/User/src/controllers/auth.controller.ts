@@ -7,6 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import type { SignupInitiateDTO } from "../dtos/signup.dto.js";
 import { ApiError } from "../utils/apiError.js";
+import type { SignupResponseDTO } from "../dtos/signupResponse.dto.js";
 
 export class AuthController implements IAuthController {
   constructor(private authService: IAuthService = new AuthService()) {
@@ -63,5 +64,27 @@ export class AuthController implements IAuthController {
     );
   }
 );
+  login = asyncHandler(
+    async (req: Request, res: Response): Promise<Response> => {
+      const user = await this.authService.login(req.body);
+      const { accessToken, refreshToken, ...userData } = user;
+      res.cookie("accessToken", user.accessToken, {
+      httpOnly: true,
+      secure: true,          
+      sameSite: "none",
+      path: '/'
+    });
+
+    res.cookie("refreshToken", user.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: '/'
+    });
+      return res.status(200).json(
+        new ApiResponse(200, userData, "Login successful")
+      );
+    }
+  )
 
 }

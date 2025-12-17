@@ -6,7 +6,7 @@ import type { IAuthService } from "./interfaces/auth.service.interface.js";
 import path from "path";
 import fs from "fs";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import { hashPassword } from "../utils/password.utils.js";
+import { comparePassword, hashPassword } from "../utils/password.utils.js";
 import type { SignupInitiateDTO } from "../dtos/signup.dto.js";
 import { generateVerificationCode } from "../utils/generateVerificationCode.js";
 import { RedisService } from "../redis/redis.service.js";
@@ -14,7 +14,8 @@ import { sendMail } from "../rabbitmq/producer.mail.rabbitmqq.js";
 import type { SignupResponseDTO } from "../dtos/signupResponse.dto.js";
 import type { SignupOtpTempData } from "../dtos/signupOtpTempData.dto.js";
 import { Types } from "mongoose";
-import { generateRefreshToken } from "../utils/jwt.utils.js";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt.utils.js";
+import type { LoginDTO } from "../dtos/login.dto.js";
 
 const tempFolder = path.resolve("public", "temp");
 export class AuthService implements IAuthService {
@@ -111,7 +112,13 @@ export class AuthService implements IAuthService {
         );
 
         const user = await this.authrepository.createUser({ ...tempData.data, password: hashedPassword }, avatar?.secure_url, refreshToken);
-
+        try {
+            if (fs.existsSync(avatarLocalPath)) {
+                fs.unlinkSync(avatarLocalPath);
+            }
+        } catch (unlinkErr) {
+            console.warn("Failed to delete local temp file:", unlinkErr);
+        }
         const createdUser = await this.authrepository.findUserById(user._id);
 
         if (!createdUser) {
@@ -120,7 +127,12 @@ export class AuthService implements IAuthService {
                 'Something went wrong while registering the user'
             );
         }
-        const accessToken = generateRefreshToken(createdUser)
+        const accessToken = generateAccessToken({
+            _id: userId.toString(),
+            email: createdUser.email,
+            username: createdUser.username,
+        });
+
         await this.redisService.del(`signup:${email}`);
 
         return {
@@ -131,6 +143,32 @@ export class AuthService implements IAuthService {
             refreshToken,
         };
 
+    }
+    async login(data: LoginDTO): Promise<SignupResponseDTO> {
+        const { username, password } = data;
+        if (!username || !password) {
+            throw new ApiError(400, "Username and password are required");
+        }
+        const user = await this.authrepository.findUser({ username: username } as SignupInitiateDTO);
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+        if (!comparePassword(password, user.password)) {
+            throw new ApiError(400, "Invalid password");
+        }
+        const accessToken = generateAccessToken({
+            _id: user._id.toString(),
+            email: user.email,
+            username: user.username,
+        });
+        const refreshToken = generateRefreshToken(user._id.toString());
 
+        return {
+            username: user.username,
+            email: user.email,
+            avatar: user.avatar,
+            accessToken,
+            refreshToken,
+        };
     }
 }

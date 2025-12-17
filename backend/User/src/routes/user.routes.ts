@@ -6,4 +6,5 @@ const authController = new AuthController();
 
 router.route("/signupInitialize").post(upload.single("avatar"),authController.signupInitiate);
 router.route("/signupVerifyCode").post(authController.signupVerifyCode);
+router.route("/login").post(authController.login);
 export default router;

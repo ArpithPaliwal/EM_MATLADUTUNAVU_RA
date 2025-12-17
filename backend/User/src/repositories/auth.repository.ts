@@ -14,7 +14,7 @@ export class AuthRepository implements IAuthRepository {
         const { username, email } = data;
         return await User.findOne({
             $or: [{ username }, { email }]
-        }).select('-password');
+        });
     }
     async findUserById(id: string): Promise<any> {
         return await User.findById(id).select('-password -refreshToken')
