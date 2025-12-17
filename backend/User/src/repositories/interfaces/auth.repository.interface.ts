@@ -1,8 +1,9 @@
-import type { SignupDTO } from "../../dtos/signup.dto.js";
+import type { SignupInitiateDTO } from "../../dtos/signup.dto.js";
+
 
 export interface IAuthRepository {
 
-    createUser(data:SignupDTO,avatar:string):Promise<any>;
-    findUser(data:SignupDTO):Promise<any>;
+    createUser(data:SignupInitiateDTO,avatar:string,refreshToken:string):Promise<any>;
+    findUser(data:SignupInitiateDTO):Promise<any>;
     findUserById(id:string):Promise<any>;
 }

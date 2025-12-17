@@ -1,4 +1,4 @@
-import type { SignupDTO } from "../dtos/signup.dto.js";
+
 import { AuthRepository } from "../repositories/auth.repository.js";
 import type { IAuthRepository } from "../repositories/interfaces/auth.repository.interface.js";
 import { ApiError } from "../utils/apiError.js";
@@ -7,71 +7,130 @@ import path from "path";
 import fs from "fs";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { hashPassword } from "../utils/password.utils.js";
-
+import type { SignupInitiateDTO } from "../dtos/signup.dto.js";
+import { generateVerificationCode } from "../utils/generateVerificationCode.js";
+import { RedisService } from "../redis/redis.service.js";
+import { sendMail } from "../rabbitmq/producer.mail.rabbitmqq.js";
+import type { SignupResponseDTO } from "../dtos/signupResponse.dto.js";
+import type { SignupOtpTempData } from "../dtos/signupOtpTempData.dto.js";
+import { Types } from "mongoose";
+import { generateRefreshToken } from "../utils/jwt.utils.js";
 
 const tempFolder = path.resolve("public", "temp");
 export class AuthService implements IAuthService {
 
-//   private authRepository: IAuthRepository;
+    //   private authRepository: IAuthRepository;
 
-//   constructor() {
-//     this.authRepository = new AuthRepository();
-//   }
-    constructor(private authrepository: IAuthRepository = new AuthRepository()) {
+    //   constructor() {
+    //     this.authRepository = new AuthRepository();
+    //   }
+    constructor(private authrepository: IAuthRepository = new AuthRepository(),
+        private redisService: RedisService = new RedisService()) {
 
     }
 
-    async signup(data: SignupDTO,avatarLocalPath:string) {
-        const {username,email,password}= data;
+    async signupInitiate(data: SignupInitiateDTO, avatarLocalPath: string) {
+        const { username, email, password } = data;
         if (
-        [ email, username, password].some(
-            (field) => field?.trim() == ''
-        )
-    ) {
-        throw new ApiError(400, 'All fields are required');
-    }
-
-    const existedUser:Boolean = await this.authrepository.findUser(data)
-    if(existedUser)
-    {
-        try {
-            if(fs.existsSync(tempFolder)){
-                const files = fs.readdirSync(tempFolder);
-                files.forEach((file) => {
-                    const filePath = path.join(tempFolder, file);
-                    fs.unlinkSync(filePath);
-                    console.log('Deleted file:', filePath);
-                });
-                console.log('All files in temp folder deleted.');
-            }
-        } catch (error) {
-            console.error('Error deleting files in temp folder:', error);
+            [email, username, password].some(
+                (field) => field?.trim() == ''
+            )
+        ) {
+            throw new ApiError(400, 'All fields are required');
         }
-        throw new ApiError(
-            409,
-            'User with this email or username already exists'
+
+        const existedUser: Boolean = await this.authrepository.findUser(data)
+        if (existedUser) {
+            try {
+                if (fs.existsSync(tempFolder)) {
+                    const files = fs.readdirSync(tempFolder);
+                    files.forEach((file) => {
+                        const filePath = path.join(tempFolder, file);
+                        fs.unlinkSync(filePath);
+                        console.log('Deleted file:', filePath);
+                    });
+                    console.log('All files in temp folder deleted.');
+                }
+            } catch (error) {
+                console.error('Error deleting files in temp folder:', error);
+            }
+            throw new ApiError(
+                409,
+                'User with this email or username already exists'
+            );
+        }
+
+        const verificationCode = generateVerificationCode();
+
+        await this.redisService.set(
+            `signup:${data.email}`,
+            {
+                data,
+                avatarLocalPath,
+                verificationCode,
+            },
+            300 // 5 min TTL
         );
+
+        await sendMail({
+            to: data.email,
+            subject: "Your OTP Code",
+            body: `Your OTP is ${verificationCode}. It expires in 5 minutes.`,
+        });
+
+
     }
-    console.log('Uploading to Cloudinary:', avatarLocalPath);
-    const avatar:any = await uploadOnCloudinary(avatarLocalPath);
-    if (!avatar) {
-        throw new ApiError(400, 'Avatar files is required');
-    }else{
-        console.log('Cloudinary response:', avatar);
-    }
+    async signupVerifyCode(email: string, code: string): Promise<SignupResponseDTO> {
 
-    const hashedPassword = await hashPassword(data.password)
-    const user = await this.authrepository.createUser({ ...data, password: hashedPassword },avatar?.secure_url)
+        const tempData = await this.redisService.get<SignupOtpTempData>(`signup:${email}`);
+        if (!tempData) {
+            throw new ApiError(400, 'verification Code expired or invalid');
+        }
+        if (tempData.verificationCode !== code) {
+            throw new ApiError(400, 'Invalid verification code');
+        }
+        const avatarLocalPath = tempData.avatarLocalPath;
 
-    const createdUser = await this.authrepository.findUserById(user._id);
+        if (!avatarLocalPath) {
+            throw new ApiError(400, "Avatar file is required");
+        }
 
-    if (!createdUser) {
-        throw new ApiError(
-            500,
-            'Something went wrong while registering the user'
+        console.log('Uploading to Cloudinary:', avatarLocalPath);
+        const avatar = await uploadOnCloudinary(avatarLocalPath);
+        if (!avatar || avatar == undefined) {
+            throw new ApiError(400, 'Avatar files is required');
+        } else {
+            console.log('Cloudinary response:', avatar);
+        }
+
+        const hashedPassword = await hashPassword(tempData.data.password)
+        const userId = new Types.ObjectId();
+
+        const refreshToken = generateRefreshToken(
+            userId.toString(),
         );
-    }
 
-    return createdUser;
+        const user = await this.authrepository.createUser({ ...tempData.data, password: hashedPassword }, avatar?.secure_url, refreshToken);
+
+        const createdUser = await this.authrepository.findUserById(user._id);
+
+        if (!createdUser) {
+            throw new ApiError(
+                500,
+                'Something went wrong while registering the user'
+            );
+        }
+        const accessToken = generateRefreshToken(createdUser)
+        await this.redisService.del(`signup:${email}`);
+
+        return {
+            username: createdUser.username,
+            email: createdUser.email,
+            avatar: createdUser.avatar,
+            accessToken,
+            refreshToken,
+        };
+
+
     }
 }

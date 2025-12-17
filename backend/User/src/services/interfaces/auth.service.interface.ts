@@ -1,6 +1,8 @@
-import type { SignupDTO } from "../../dtos/signup.dto.js";
+import type { SignupInitiateDTO } from "../../dtos/signup.dto.js";
+
 
 export interface IAuthService {
-    signup(data:SignupDTO,avatarLocalPath?: string):Promise<any>;
+    signupInitiate(data:SignupInitiateDTO,avatarLocalPath?: string):Promise<any>;
+    signupVerifyCode(email:string,code:string):Promise<any>;
 }
 
