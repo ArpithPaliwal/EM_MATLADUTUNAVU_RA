@@ -7,5 +7,7 @@ export interface IAuthService {
     signupInitiate(data:SignupInitiateDTO,avatarLocalPath?: string):Promise<any>;
     signupVerifyCode(email:string,code:string):Promise<any>;
     login(data: LoginDTO): Promise<SignupResponseDTO>;
+    isUsernameAvailable(username: string): Promise<boolean>;
+    updateUsername(userId: string, newUsername: string): Promise<string>;
 }
 

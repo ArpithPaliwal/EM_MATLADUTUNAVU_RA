@@ -19,4 +19,11 @@ export class AuthRepository implements IAuthRepository {
     async findUserById(id: string): Promise<any> {
         return await User.findById(id).select('-password -refreshToken')
     }
+    async updateUsername(userId: string, newUsername: string): Promise<any> {
+        return await User.findByIdAndUpdate(
+            userId,
+            { username: newUsername.toLowerCase() },
+            { new: true }
+        ).select('-password -refreshToken -email -avatar');
+    }
 }

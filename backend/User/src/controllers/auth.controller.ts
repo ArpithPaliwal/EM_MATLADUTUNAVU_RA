@@ -17,7 +17,7 @@ export class AuthController implements IAuthController {
     async (req: Request, res: Response): Promise<Response> => {
       const signupData: SignupInitiateDTO = req.body;
       const avatarLocalPath = req.file?.path;
-       await this.authService.signupInitiate(signupData, avatarLocalPath);
+      await this.authService.signupInitiate(signupData, avatarLocalPath);
 
       return res
         .status(201)
@@ -28,63 +28,93 @@ export class AuthController implements IAuthController {
     }
   );
   signupVerifyCode = asyncHandler(
-  async (req: Request, res: Response): Promise<Response> => {
-    const { email, otp } = req.body;
+    async (req: Request, res: Response): Promise<Response> => {
+      const { email, otp } = req.body;
 
-    if (!email || !otp) {
-      throw new ApiError(400, "Email and verification code are required");
+      if (!email || !otp) {
+        throw new ApiError(400, "Email and verification code are required");
+      }
+
+      const result = await this.authService.signupVerifyCode(email, otp);
+
+
+      res.cookie("accessToken", result.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: '/'
+      });
+
+      res.cookie("refreshToken", result.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: '/'
+      });
+
+      const { accessToken, refreshToken, ...userData } = result;
+
+
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          userData,
+          "User registered successfully"
+        )
+      );
     }
-
-    const result = await this.authService.signupVerifyCode(email, otp);
-
-    
-    res.cookie("accessToken", result.accessToken, {
-      httpOnly: true,
-      secure: true,          
-      sameSite: "none",
-      path: '/'
-    });
-
-    res.cookie("refreshToken", result.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: '/'
-    });
-
-    const { accessToken, refreshToken, ...userData } = result;
-
-    
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        userData,
-        "User registered successfully"
-      )
-    );
-  }
-);
+  );
   login = asyncHandler(
     async (req: Request, res: Response): Promise<Response> => {
       const user = await this.authService.login(req.body);
       const { accessToken, refreshToken, ...userData } = user;
       res.cookie("accessToken", user.accessToken, {
-      httpOnly: true,
-      secure: true,          
-      sameSite: "none",
-      path: '/'
-    });
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: '/'
+      });
 
-    res.cookie("refreshToken", user.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: '/'
-    });
+      res.cookie("refreshToken", user.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: '/'
+      });
       return res.status(200).json(
         new ApiResponse(200, userData, "Login successful")
       );
     }
   )
+  checkUsernameAvailability = asyncHandler(
+    async (req: Request, res: Response): Promise<Response> => {
+      const { username } = req.params;
+      if (!username || username.trim() === "" || username === undefined) {
+        throw new ApiError(400, "Username is required");
+      }
+      const isAvailable = await this.authService.isUsernameAvailable(username?.toLowerCase());
+      return res.status(200).json(
+        new ApiResponse(200, { isAvailable }, "Username availability checked")
+      );
+    }
+  )
+  updateUsername = asyncHandler(
+    async (req: Request, res: Response): Promise<Response> => {
+      const userId = req.user?._id;
+      const { username } = req.body;
 
+      if (!username || username.trim() === "" || username === undefined) {
+        throw new ApiError(400, "Username is required");
+      }
+      const isAvailable = await this.authService.isUsernameAvailable(username?.toLowerCase());
+      if (!isAvailable) {
+        throw new ApiError(409, "Username is already taken");
+      }
+
+      const updatedUsername = await this.authService.updateUsername(userId, username?.toLowerCase());
+
+      return res.status(200).json(
+        new ApiResponse(200, { username: updatedUsername }, "Username updated successfully")
+      )
+    }
 }

@@ -177,4 +177,19 @@ export class AuthService implements IAuthService {
             refreshToken,
         };
     }
+    async isUsernameAvailable(username: string): Promise<boolean> {
+        const user = await this.authrepository.findUser({ username } as SignupInitiateDTO);
+        return !user;
+    }
+    async updateUsername(userId: string, newUsername: string): Promise<string> {
+        const user = await this.authrepository.findUserById(userId);
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+        const userWithUpdateUsername=await this.authrepository.updateUsername(userId, newUsername);
+        if(!userWithUpdateUsername){
+            throw new ApiError(500, "Failed to update username");
+        }   
+        return userWithUpdateUsername.username;
+    }   
 }

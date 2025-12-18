@@ -4,4 +4,6 @@ export interface IAuthController {
   signupInitiate: RequestHandler;
   signupVerifyCode: RequestHandler;
   login: RequestHandler;
+  checkUsernameAvailability: RequestHandler;
+  updateUsername: RequestHandler;
 }

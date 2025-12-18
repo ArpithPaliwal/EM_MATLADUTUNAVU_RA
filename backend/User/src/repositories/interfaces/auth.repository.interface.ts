@@ -6,4 +6,5 @@ export interface IAuthRepository {
     createUser(data:SignupInitiateDTO,avatar:string,refreshToken:string):Promise<any>;
     findUser(data:SignupInitiateDTO):Promise<any>;
     findUserById(id:string):Promise<any>;
+    updateUsername(userId: string, newUsername: string): Promise<any>;
 }
