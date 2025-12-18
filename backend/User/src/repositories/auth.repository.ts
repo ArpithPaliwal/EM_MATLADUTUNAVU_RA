@@ -33,4 +33,11 @@ export class AuthRepository implements IAuthRepository {
             { new: true }
         ).select('-password -refreshToken -email -username');
     }
+    async updatePassword(userId: string, hashedPassword: string): Promise<any> {
+        return await User.findByIdAndUpdate(
+            userId,
+            { password: hashedPassword },
+            { new: true }
+        );
+    }
 }

@@ -224,4 +224,18 @@ export class AuthService implements IAuthService {
 
         return userWithUpdatedAvatar.avatar;
     }
+    async updatePassword(username: SignupInitiateDTO, userId: string, currentPassword: string, newPassword: string): Promise<void> {
+
+        const user = await this.authrepository.findUser(username as SignupInitiateDTO);
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+        if (!comparePassword(currentPassword, user.password)) {
+            throw new ApiError(400, "Current password is incorrect");
+        }
+        const  hashedpassword=await hashPassword(newPassword);
+
+        const updatedPassword = await this.authrepository.updatePassword(userId, hashedpassword);
+        return updatedPassword;
+    }
 }

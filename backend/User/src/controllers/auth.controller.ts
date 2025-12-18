@@ -134,4 +134,21 @@ export class AuthController implements IAuthController {
       )
     } 
   )
+  updatePassword = asyncHandler(
+    async (req: Request, res: Response): Promise<Response> => {
+      const username = req.user?.username;
+      const userId = req.user?._id;
+      const { currentPassword, newPassword } = req.body; 
+      if (!currentPassword || !newPassword) {
+        throw new ApiError(400, "Current password and new password are required");
+      }
+      const updatedPassword = await this.authService.updatePassword(username, userId, currentPassword, newPassword);
+      if(updatedPassword===undefined){
+        throw new ApiError(500, "Failed to update password");
+      }
+      return res.status(200).json(
+        new ApiResponse(200, null, "Password updated successfully")
+      )
+    } 
+  )
 }
