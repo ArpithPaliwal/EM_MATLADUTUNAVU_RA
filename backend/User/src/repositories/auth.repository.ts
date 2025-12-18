@@ -26,4 +26,11 @@ export class AuthRepository implements IAuthRepository {
             { new: true }
         ).select('-password -refreshToken -email -avatar');
     }
+    async updateAvatar(userId: string, avatarLocalPath: string): Promise<any> {
+        return await User.findByIdAndUpdate(
+            userId,
+            { avatar: avatarLocalPath },
+            { new: true }
+        ).select('-password -refreshToken -email -username');
+    }
 }

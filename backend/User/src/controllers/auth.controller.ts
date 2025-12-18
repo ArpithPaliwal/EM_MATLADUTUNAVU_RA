@@ -117,4 +117,21 @@ export class AuthController implements IAuthController {
         new ApiResponse(200, { username: updatedUsername }, "Username updated successfully")
       )
     }
+  )
+  updateAvatar = asyncHandler(
+    async (req: Request, res: Response): Promise<Response> => {
+      const userId = req.user?._id;
+      const avatarLocalPath:string | undefined = req.file?.path;
+      if (!avatarLocalPath) {
+        throw new ApiError(400, "Avatar file is required");
+      }
+      const updatedAvatarUrl:string | undefined = await this.authService.updateAvatar(userId, avatarLocalPath);
+      if(!updatedAvatarUrl){
+        throw new ApiError(500, "Failed to update avatar");
+      }
+      return res.status(200).json(
+        new ApiResponse(200, { avatarUrl: updatedAvatarUrl }, "Avatar updated successfully")
+      )
+    } 
+  )
 }

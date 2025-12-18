@@ -6,4 +6,5 @@ export interface IAuthController {
   login: RequestHandler;
   checkUsernameAvailability: RequestHandler;
   updateUsername: RequestHandler;
+  updateAvatar: RequestHandler;
 }

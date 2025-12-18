@@ -9,5 +9,6 @@ export interface IAuthService {
     login(data: LoginDTO): Promise<SignupResponseDTO>;
     isUsernameAvailable(username: string): Promise<boolean>;
     updateUsername(userId: string, newUsername: string): Promise<string>;
+    updateAvatar(userId: string, avatarLocalPath: string): Promise<string>;
 }
 

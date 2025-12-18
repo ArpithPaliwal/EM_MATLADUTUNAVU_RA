@@ -192,4 +192,36 @@ export class AuthService implements IAuthService {
         }   
         return userWithUpdateUsername.username;
     }   
+    async updateAvatar(userId: string, avatarLocalPath: string): Promise<string> {
+        const user = await this.authrepository.findUserById(userId);
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+        if (!avatarLocalPath) {
+            throw new ApiError(400, "Avatar file is required");
+        }
+
+        console.log('Uploading to Cloudinary:', avatarLocalPath);
+        const avatar = await uploadOnCloudinary(avatarLocalPath);
+        if (!avatar || avatar == undefined) {
+            throw new ApiError(400, 'Avatar files is required');
+        } else {
+            console.log('Cloudinary response:', avatar);
+        }
+
+        const userWithUpdatedAvatar = await this.authrepository.updateAvatar(userId, avatar?.secure_url);
+        if (!userWithUpdatedAvatar) {
+            throw new ApiError(500, "Failed to update avatar");
+        }
+
+        try {
+            if (fs.existsSync(avatarLocalPath)) {
+                fs.unlinkSync(avatarLocalPath);
+            }
+        } catch (unlinkErr) {
+            console.warn("Failed to delete local temp file:", unlinkErr);
+        }
+
+        return userWithUpdatedAvatar.avatar;
+    }
 }
