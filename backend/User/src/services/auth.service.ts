@@ -16,6 +16,7 @@ import type { SignupOtpTempData } from "../dtos/signupOtpTempData.dto.js";
 import { Types } from "mongoose";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.utils.js";
 import type { LoginDTO } from "../dtos/login.dto.js";
+import { rateLimit } from "../redis/redisRateLimit.service.js";
 
 const tempFolder = path.resolve("public", "temp");
 export class AuthService implements IAuthService {
@@ -60,6 +61,11 @@ export class AuthService implements IAuthService {
                 'User with this email or username already exists'
             );
         }
+        await rateLimit({
+            key: `rate_limit:otp:${email}`,
+            limit: 5,
+            windowInSeconds: 10 * 60, // 10 minutes
+        });
 
         const verificationCode = generateVerificationCode();
 

@@ -7,7 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import type { SignupInitiateDTO } from "../dtos/signup.dto.js";
 import { ApiError } from "../utils/apiError.js";
-import type { SignupResponseDTO } from "../dtos/signupResponse.dto.js";
+
 
 export class AuthController implements IAuthController {
   constructor(private authService: IAuthService = new AuthService()) {
