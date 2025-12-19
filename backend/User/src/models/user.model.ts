@@ -25,7 +25,7 @@ const schema: Schema<IUser> = new Schema(
             required:[true,"password is required"]
         },
         avatar:{
-            type:String, //cloudinary
+            type:String,
             
             
         },
