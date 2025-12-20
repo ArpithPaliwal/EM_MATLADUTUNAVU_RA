@@ -8,4 +8,5 @@ export interface IAuthController {
   updateUsername: RequestHandler;
   updateAvatar: RequestHandler;
   updatePassword: RequestHandler;
+  getUserInBulk: RequestHandler;
 }

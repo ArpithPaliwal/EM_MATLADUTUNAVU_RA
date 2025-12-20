@@ -40,4 +40,7 @@ export class AuthRepository implements IAuthRepository {
             { new: true }
         );
     }
+    async getUserInBulk(userIds: string[]): Promise<any[]> {
+        return  await User.find({ _id: { $in: userIds } },{username:1,avatar:1}).lean();
+    }
 }

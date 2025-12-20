@@ -6,6 +6,8 @@ import 'dotenv/config';
 //   path: path.resolve(process.cwd(), ".env"),
 // });
 //this doesnt work becz nodenext first resolves all the imports and then runs the code , but when imports are resolved dotenv is not loaded
+
+
 import { app } from './app.js';
 import connectDB from './db/index.js';
 import { connectRedis } from './redis/index.js';

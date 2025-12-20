@@ -238,4 +238,8 @@ export class AuthService implements IAuthService {
         const updatedPassword = await this.authrepository.updatePassword(userId, hashedpassword);
         return updatedPassword;
     }
+    async getUserInBulk(userIds: string[]): Promise<any[]> {
+        const users = await this.authrepository.getUserInBulk(userIds);
+        return users;
+    }
 }

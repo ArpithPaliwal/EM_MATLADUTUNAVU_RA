@@ -151,4 +151,16 @@ export class AuthController implements IAuthController {
       )
     } 
   )
+  getUserInBulk = asyncHandler(
+    async (req: Request, res: Response): Promise<Response> => {
+      const userIds: string[] = req.body.userIds; 
+      if (!Array.isArray(userIds) || userIds.length === 0) {
+        throw new ApiError(400, "User IDs array is required");
+      }
+      const users = await this.authService.getUserInBulk(userIds);  
+      return res.status(200).json(
+        new ApiResponse(200, { users }, "Users fetched successfully")
+      )
+    } 
+  )
 }
