@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
-import type  { IConversation } from "./interface/conversationType.interface.js";
+import type  { IConversation } from "./interface/conversation.interface.js";
 
 const groupAvatarSchema = new Schema(
   {
@@ -23,7 +23,7 @@ const conversationSchema = new Schema<IConversation>(
       required: true,
     },
 
-    participants: [
+    members: [
       {
         type: Schema.Types.ObjectId,
         ref: "User",

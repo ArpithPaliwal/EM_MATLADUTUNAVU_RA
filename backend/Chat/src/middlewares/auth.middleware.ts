@@ -2,7 +2,7 @@ import { ApiError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from 'jsonwebtoken';
 export const verifyJWT = asyncHandler(
-  async (req, _, next): Promise<void> => {
+  async (req,_, next): Promise<void> => {
     try {
       const accessToken = req.cookies?.accessToken;
         if (!accessToken) { 

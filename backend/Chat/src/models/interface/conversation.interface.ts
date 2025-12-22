@@ -1,18 +1,18 @@
 import { Types } from "mongoose";
 
-export type ConversationType = "direct" | "group";
+
 
 export interface GroupAvatar {
   url: string;
   publicId: string;
 }
 
-export interface IConversation {
+export interface IConversation  {
   
 
-  type: ConversationType;
+  type: "direct" | "group";
 
-  participants: Types.ObjectId[];     
+  members: Types.ObjectId[];     
   createdBy: Types.ObjectId;
 
 
@@ -24,6 +24,6 @@ export interface IConversation {
   lastMessageSenderId?: Types.ObjectId;
   lastMessageAt?: Date;
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
