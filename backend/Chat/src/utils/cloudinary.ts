@@ -46,3 +46,23 @@ const uploadOnCloudinary = async (
 };
 
 export { uploadOnCloudinary };
+
+
+
+
+const deleteFromCloudinary = async (
+  publicId: string
+): Promise<boolean> => {
+  if (!publicId) return false;
+
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+
+    return result.result === "ok";
+  } catch (error) {
+    console.error("Cloudinary delete failed:", error);
+    throw error;
+  }
+};
+
+export { deleteFromCloudinary };

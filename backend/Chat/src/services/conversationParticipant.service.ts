@@ -1,10 +1,21 @@
-import type { IConversationParticipantService } from "./interfaces/createConversationParticipant.service.interface.js";
+import type { IConversationParticipantService } from "./interfaces/ConversationParticipant.service.interface.js";
 import type { CreateConversationParticipantDTO } from "../dtos/createConversationParticipant.dto.js";
+import type { IConversationParticipantRepository } from "../repositories/interfaces/conversationParticipant..repository.interface.js";
+import { ConversationParticipantRepository } from "../repositories/conversationParticipant.repository.js";
 
 
 
 export class ConversationParticipantService implements IConversationParticipantService {
-    async createConversationParticipants(data: CreateConversationParticipantDTO): Promise<void> {
+    constructor(private conversationParticipantRepository: IConversationParticipantRepository   = new ConversationParticipantRepository()) { }
+    async createConversationParticipants(data: CreateConversationParticipantDTO, session: any): Promise<void> {
         // Implementation for creating conversation participants
+        
+        await this.conversationParticipantRepository.createConversationParticipants(data,session);
+    }
+
+    async updateConversationParticipants(data:any): Promise<void> {
+
+        const {_id , senderId, conversationId} = data;
     }
 }
+

@@ -5,7 +5,11 @@ export interface IMessage {
     senderId: Types.ObjectId;
 
     text: string;
-    messageSeenStatus: MessageSeenStatus;
+    imageUrl?: string;
+    imagePublicId?: string;
+    videoUrl?: string;
+    videoPublicId?: string;
+    messageSeenStatus?: MessageSeenStatus;
     createdAt: Date;
     updatedAt: Date;
 }

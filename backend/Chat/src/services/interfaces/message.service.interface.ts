@@ -1,3 +1,3 @@
 export interface IMessageService {
-    createMessage(conversationId: string, senderId: string, content: string): Promise<any>;
+    createMessage(conversationId: string, senderId: string, text: string, imageOrVideoPath?: string,): Promise<any>;
 }

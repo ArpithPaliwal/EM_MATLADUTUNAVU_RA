@@ -4,13 +4,13 @@ import type { PrivateConversationDTO, createGroupConversationDTO } from "../dtos
 import { ConversationRepository } from "../repositories/conversation.repository.js";
 import type { IConversationRepository } from "../repositories/interfaces/conversation.repository.interface.js";
 import type { IConversationService } from "./interfaces/conversation.service.interface.js";
-import type { IConversationParticipantService } from "./interfaces/createConversationParticipant.service.interface.js";
+import type { IConversationParticipantService } from "./interfaces/ConversationParticipant.service.interface.js";
 import { ConversationParticipantService } from "./conversationParticipant.service.js";
 import path from "path";
 import fs from "fs";
 import { ApiError } from "../utils/apiError.js";
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 
-const tempFolder = path.resolve("public", "temp");
 
 export class ConversationService implements IConversationService {
     constructor(private conversationrepository: IConversationRepository = new ConversationRepository(),
@@ -31,16 +31,16 @@ export class ConversationService implements IConversationService {
         const session = await mongoose.startSession();
         try {
             session.startTransaction();
-            const conversation = await this.conversationrepository.createPrivateConversation(data,session);
+            const conversation = await this.conversationrepository.createPrivateConversation(data, session);
 
-            await this.conversationParticipantService.createConversationParticipants({ userIds: [userId, memberId], conversationId: conversation._id },session);
+            await this.conversationParticipantService.createConversationParticipants({ userIds: [userId, memberId], conversationId: conversation._id }, session);
 
             await session.commitTransaction();
-            
+
             return conversation;
         } catch (error) {
             await session.abortTransaction();
-            
+
             throw error;
         }
         finally {
@@ -52,39 +52,41 @@ export class ConversationService implements IConversationService {
 
     }
     async createGroupConversation(data: createGroupConversationDTO): Promise<any> {
-        const {groupName, memberIds, createdBy , avatar} = data;
+        const { groupName, memberIds, createdBy,avatarLocalPath} = data;
+        
+        if(!memberIds?.length || !groupName || !avatarLocalPath){
+            throw new ApiError(400, "Group name and member ids avatar  required");
+        }
+
+
+        const avatarCloudinaryData = await  uploadOnCloudinary(avatarLocalPath );
+            if(!avatarCloudinaryData    ){
+                throw new ApiError(500, "Failed to upload avatar on Cloudinary");
+            }
+        
+            const avatar = avatarCloudinaryData?.secure_url
         const session = await mongoose.startSession();
         try {
-            
+
             session.startTransaction();
-            const conversation = await this.conversationrepository.createGroupConversation(data,session);
-            await this.conversationParticipantService.createConversationParticipants({ userIds: memberIds, conversationId: conversation._id },session);
+            
+            const conversation = await this.conversationrepository.createGroupConversation(data, session);
+            await this.conversationParticipantService.createConversationParticipants({ userIds: memberIds, conversationId: conversation._id }, session);
 
             await session.commitTransaction();
-            
+
             return conversation;
         } catch (error) {
-            
+            await deleteFromCloudinary(avatarCloudinaryData?.public_id);
             await session.abortTransaction();
+
             
-            try {
-                if (fs.existsSync(tempFolder)) {
-                    const files = fs.readdirSync(tempFolder);
-                    files.forEach((file) => {
-                        const filePath = path.join(tempFolder, file);
-                        fs.unlinkSync(filePath);
-                        console.log('Deleted file:', filePath);
-                    });
-                    console.log('All files in temp folder deleted.');
-                }
-            } catch (error) {
-                console.error('Error deleting files in temp folder:', error);
-            }
+
             throw error;
         } finally {
-            
+
             session.endSession();
         }
     }
-    
+
 }

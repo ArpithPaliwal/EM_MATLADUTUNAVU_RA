@@ -18,7 +18,7 @@ export class ConversationController implements IConversationController {
   createGroupConversation = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const { groupName, memberIds, createdBy } = req.body;
     const avatarLocalPath = req.file?.path;
-    const conversation = await this.conversationService.createGroupConversation({ groupName, memberIds, createdBy, avatar: avatarLocalPath });
+    const conversation = await this.conversationService.createGroupConversation({ groupName, memberIds, createdBy, avatarLocalPath });
     return res.status(201).json(new ApiResponse(201, conversation, "Group conversation created successfully"));
   })
 }

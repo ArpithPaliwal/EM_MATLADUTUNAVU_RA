@@ -18,8 +18,25 @@ const messageSchema = new Schema<IMessage>(
 
     text: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.imageUrl && !this.videoUrl;
+      },
       trim: true,
+    },
+    imageUrl: {
+      type: String,
+      trim: true,
+      
+  },
+    videoUrl: {
+      type: String,
+      trim: true,   
+  },
+
+    messageSeenStatus: {  
+      type: String,
+      enum: ["delivered", "read"],
+      default: "delivered",
     },
   },
   {

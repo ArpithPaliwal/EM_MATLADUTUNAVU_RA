@@ -17,7 +17,10 @@ const conversationParticipantSchema =
         required: true,
         index: true,
       },
-
+      senderId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
       unreadCount: {
         type: Number,
         default: 0,

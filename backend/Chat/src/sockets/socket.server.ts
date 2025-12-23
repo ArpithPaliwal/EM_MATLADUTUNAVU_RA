@@ -2,9 +2,9 @@ import { Server } from "socket.io";
 import http from "http";
 import { socketAuthMiddleware } from "./socket.middleware.js";
 import { handleSocketConnection } from "./socket.handlers.js";
-
+let io: Server;
 export const initSocketServer = (server: http.Server): Server => {
-  const io = new Server(server, {
+   io = new Server(server, {
     cors: {
       origin: ["http://localhost:5173"],
       credentials: true,
@@ -17,5 +17,11 @@ export const initSocketServer = (server: http.Server): Server => {
     handleSocketConnection(io, socket);
   });
 
+  return io;
+};
+export const getIO = (): Server => {
+  if (!io) {
+    throw new Error("Socket.io not initialized");
+  }
   return io;
 };
