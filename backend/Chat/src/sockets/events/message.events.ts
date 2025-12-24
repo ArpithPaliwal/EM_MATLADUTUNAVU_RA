@@ -1,9 +1,12 @@
 import { Server } from "socket.io";
-import { ConversationParticipantService } 
+import { ConversationParticipantService }
   from "../../services/conversationParticipant.service.js";
 
 const conversationParticipantService =
   new ConversationParticipantService();
+
+import { ConversationService } from "../../services/conversation.service.js";
+const conversationService = new ConversationService();
 
 export const emitMessageEvents = async (
   io: Server,
@@ -12,7 +15,7 @@ export const emitMessageEvents = async (
   const { conversationId, senderId } = message;
   console.log("🔍 DEBUG: Full Message Object:", message);
 
-  
+
 
   // 2. Log the exact room name we are trying to talk to
   const roomName = `conversation:${conversationId}`;
@@ -23,40 +26,44 @@ export const emitMessageEvents = async (
   console.log(`👥 DEBUG: Sockets found in room '${roomName}':`, sockets.length);
 
   // The actual emit
-  io.to(roomName).emit("message:new", message);
+
   io.to(`conversation:${conversationId}`).emit("message:new", message);
 
-  
+
   const socketsInRoom = await io
     .in(`conversation:${conversationId}`)
     .fetchSockets();
 
-  const processedUsers = new Set<string>();
+  const activeUsers = new Set<string>();
 
-  for (const s of socketsInRoom) {
-    const targetUserId = s.data.userId;
-
-    if (!targetUserId || targetUserId === senderId) continue;
-    if (processedUsers.has(targetUserId)) continue;
-
-    processedUsers.add(targetUserId);
-
-    const isActive = socketsInRoom.some(
-      (sock) =>
-        sock.data.userId === targetUserId &&
-        sock.data.activeConversations.has(conversationId)
-    );
-
-    if (!isActive) {
-     
-      io.to(`user:${targetUserId}`).emit("conversation:unreadUpdate", {
-        conversationId,
-        incrementBy: 1,
-      });
-
-      
-      await conversationParticipantService
-        .updateConversationParticipants(message, targetUserId);
+  for (const socket of socketsInRoom) {
+    if (
+      socket.data.userId &&
+      socket.data.activeConversations?.has(conversationId)
+    ) {
+      activeUsers.add(socket.data.userId);
     }
   }
+  const allMembers = await conversationService.getConversationMembers(
+    conversationId
+  );
+  for (const member of allMembers) {
+  if (member.userId === senderId) continue;
+
+  const isActive = activeUsers.has(member.userId);
+
+  if (!isActive) {
+    io.to(`user:${member.userId}`).emit("conversation:unreadUpdate", {
+      conversationId,
+      incrementBy: 1,
+    });
+
+    await conversationParticipantService.updateConversationParticipants(
+      message,
+      member.userId
+    );
+  }
+}
+
+
 };

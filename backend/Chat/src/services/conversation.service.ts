@@ -6,8 +6,7 @@ import type { IConversationRepository } from "../repositories/interfaces/convers
 import type { IConversationService } from "./interfaces/conversation.service.interface.js";
 import type { IConversationParticipantService } from "./interfaces/ConversationParticipant.service.interface.js";
 import { ConversationParticipantService } from "./conversationParticipant.service.js";
-import path from "path";
-import fs from "fs";
+
 import { ApiError } from "../utils/apiError.js";
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 
@@ -54,7 +53,9 @@ export class ConversationService implements IConversationService {
     }
     async createGroupConversation(data: createGroupConversationDTO): Promise<any> {
         const { groupName, memberIds, createdBy,avatarLocalPath} = data;
-        
+        if(Array.isArray(memberIds) && memberIds.length<2){
+            throw new ApiError(400, "At least two members are required to create a group conversation");
+        }
         if(!memberIds?.length || !groupName || !avatarLocalPath){
             throw new ApiError(400, "Group name and member ids avatar  required");
         }
@@ -66,6 +67,7 @@ export class ConversationService implements IConversationService {
             }
         
             const avatar = avatarCloudinaryData?.secure_url
+            data.avatarLocalPath=avatar;
         const session = await mongoose.startSession();
         try {
 
@@ -90,4 +92,8 @@ export class ConversationService implements IConversationService {
         }
     }
 
+    async getConversationMembers(conversationId: string): Promise<any> {
+        const members = await this.conversationrepository.getConversationMembers(conversationId);
+        return members;
+    }
 }

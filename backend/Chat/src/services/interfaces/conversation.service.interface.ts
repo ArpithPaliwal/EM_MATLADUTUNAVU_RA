@@ -3,4 +3,5 @@ import type { createGroupConversationDTO, PrivateConversationDTO } from "../../d
 export interface IConversationService {
     createPrivateConversation(data: PrivateConversationDTO): Promise<any>;
     createGroupConversation(data: createGroupConversationDTO): Promise<any>;
+    getConversationMembers(conversationId: string): Promise<any>;
 }

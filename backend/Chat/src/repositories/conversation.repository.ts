@@ -23,15 +23,19 @@ export class ConversationRepository implements IConversationRepository {
         })
     }
     async createGroupConversation(data:any,session:ClientSession): Promise<any> {
-        const { groupName, memberIds, createdBy, avatar } = data;
+        const { groupName, memberIds, createdBy, avatarLocalPath } = data;
+        
         const createConversation: any = {
             type: "group",
             groupName,
             members: memberIds,
             createdBy,
-            avatar
+            avatar:avatarLocalPath
         }
         return await Conversation.create(createConversation, { session});
     }
-    
+    async getConversationMembers(conversationId: string): Promise<any> {
+        const conversation = await Conversation.findById(conversationId).select("members");
+        return conversation ? conversation.members : null;
+    }
 }
