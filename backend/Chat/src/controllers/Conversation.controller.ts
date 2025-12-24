@@ -10,8 +10,9 @@ export class ConversationController implements IConversationController {
 
   createPrivateConversation = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const { memberId } = req.body;
-    const {userId} = req.user._id
-    const conversation = await this.conversationService.createPrivateConversation({ memberId, userId });
+    const userId = req.user?._id
+    console.log("USER ID FROM REQ.USER:", userId);
+    const conversation = await this.conversationService.createPrivateConversation({ memberId, userId ,createdBy:userId});
     return res.status(201).json(new ApiResponse(201, conversation, "Private conversation created successfully"));
   })
   

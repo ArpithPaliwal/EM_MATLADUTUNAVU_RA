@@ -5,10 +5,16 @@ import type { ClientSession } from "mongoose";
 
 export class ConversationParticipantRepository implements IConversationParticipantRepository {
     async createConversationParticipants(data: CreateConversationParticipantDTO,session:ClientSession): Promise<void> {
-        // Implementation for creating conversation participants in the database
+        
         const { userIds, conversationId } = data;
         const docs = userIds.map(userId => ({ userId, conversationId }));
-        // Assume ConversationParticipantModel is a Mongoose model
+        
         await ConversationParticipant.insertMany(docs, { session }  );
     }   
+    async updateConversationParticipants(_id: string, userId: string, conversationId: string, senderId: string): Promise<void> {
+        await ConversationParticipant.updateOne(
+            { userId, conversationId, lastReadMessageId: _id, senderId },
+            { $inc: { unreadCount: 1 } }
+        );
+    }
 }

@@ -1,9 +1,10 @@
 import 'dotenv/config';
+
 import connectDB from './db/index.js';
 // import { app } from './app.js';
 // import connectDB from './db/index.js';
 import http from "http";
-// import {app} from "./app.js";
+import {app} from "./app.js";
 import { initSocketServer } from "./sockets/socket.server.js";
 
 const server = http.createServer(app);

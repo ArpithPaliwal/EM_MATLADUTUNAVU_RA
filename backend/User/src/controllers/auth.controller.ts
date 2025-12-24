@@ -163,4 +163,16 @@ export class AuthController implements IAuthController {
       )
     } 
   )
+  userExists = asyncHandler(
+    async (req: Request, res: Response): Promise<Response> => {
+      const { userId } = req.params;
+      if (!userId || userId.trim() === "" || userId === undefined) {
+        throw new ApiError(400, "User ID is required");
+      }
+      const exists = await this.authService.userExists(userId);
+      return res.status(200).json(
+        new ApiResponse(200, exists , "User existence checked successfully")
+      )
+    }
+  )
 }

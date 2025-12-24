@@ -12,5 +12,6 @@ export interface IAuthService {
     updateAvatar(userId: string, avatarLocalPath: string): Promise<string>;
     updatePassword(username: SignupInitiateDTO, userId: string, currentPassword: string, newPassword: string): Promise<void>;
     getUserInBulk(userIds: string[]): Promise<any[]>;
+    userExists(userId: string): Promise<boolean>;
 }
 

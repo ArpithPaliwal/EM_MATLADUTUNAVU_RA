@@ -19,6 +19,6 @@ export class MessageRepository implements IMessageRepository {
             messageData.videoPublicId = videoPublicId;
         }
 
-        await Message.create(messageData);
+        return await Message.create(messageData);
     }
 }

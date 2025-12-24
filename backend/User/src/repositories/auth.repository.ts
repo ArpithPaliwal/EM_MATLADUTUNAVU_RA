@@ -43,4 +43,8 @@ export class AuthRepository implements IAuthRepository {
     async getUserInBulk(userIds: string[]): Promise<any[]> {
         return  await User.find({ _id: { $in: userIds } },{username:1,avatar:1}).lean();
     }
+    async userExists(userId: string): Promise<boolean> {
+        const user = await User.findById(userId).select('_id');
+        return user !== null;
+    }
 }

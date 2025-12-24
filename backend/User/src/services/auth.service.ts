@@ -242,4 +242,9 @@ export class AuthService implements IAuthService {
         const users = await this.authrepository.getUserInBulk(userIds);
         return users;
     }
+    async userExists(userId: string): Promise<boolean> {
+        const exists = await this.authrepository.userExists(userId);
+        console.log(`User existence check for ID ${userId}: ${exists}`);
+        return exists;
+    }
 }

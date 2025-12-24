@@ -31,9 +31,7 @@ const conversationParticipantSchema =
         ref: "Message",
       },
 
-      lastReadAt: {
-        type: Date,
-      },
+      
 
       
     },

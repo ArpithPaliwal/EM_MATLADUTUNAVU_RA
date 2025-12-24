@@ -13,9 +13,11 @@ export class ConversationParticipantService implements IConversationParticipantS
         await this.conversationParticipantRepository.createConversationParticipants(data,session);
     }
 
-    async updateConversationParticipants(data:any): Promise<void> {
+    async updateConversationParticipants(data:any,userId:any): Promise<void> {
 
-        const {_id , senderId, conversationId} = data;
+        const {_id , senderId, conversationId,} = data;
+        console.log("SERVICE DATA RECEIVED:", data);
+        await this.conversationParticipantRepository.updateConversationParticipants(_id,userId,conversationId,senderId);
     }
 }
 

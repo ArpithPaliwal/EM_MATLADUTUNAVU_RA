@@ -10,4 +10,5 @@ export interface IAuthRepository {
     updateAvatar(userId: string, avatarLocalPath: string): Promise<any>;
     updatePassword(userId: string, hashedPassword: string): Promise<any>;
     getUserInBulk(userIds: string[]): Promise<any[]>;
+    userExists(userId: string): Promise<boolean>;
 }

@@ -9,7 +9,7 @@ export interface IConversationParticipant {
   unreadCount: number;
 
   lastReadMessageId?: Types.ObjectId;
-  lastReadAt?: Date;
+  
   senderId?: Types.ObjectId;
 
   createdAt: Date;

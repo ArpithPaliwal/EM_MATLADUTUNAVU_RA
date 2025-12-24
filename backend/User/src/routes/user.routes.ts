@@ -13,4 +13,5 @@ router.route("/updateUsername").put(authController.updateUsername);
 router.route("/updateAvatar").put(upload.single("avatar"),authController.updateAvatar);
 router.route("/updatePassword").put(authController.updatePassword);
 router.route("/getUserInBulk").post(authController.getUserInBulk);
+router.route("/userExists/:userId").get( authController.userExists);
 export default router;

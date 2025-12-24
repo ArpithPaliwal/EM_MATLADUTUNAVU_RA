@@ -28,6 +28,7 @@ export class ConversationService implements IConversationService {
         if (conversationExists) {
             throw new Error("conversation already exists");
         }
+        
         const session = await mongoose.startSession();
         try {
             session.startTransaction();
