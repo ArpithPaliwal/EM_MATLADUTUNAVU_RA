@@ -5,4 +5,5 @@ export interface IConversationRepository {
     checkExistingPrivateConversation(data: PrivateConversationDTO): Promise<any>;
     createGroupConversation(data: createGroupConversationDTO,session:any): Promise<any>;
     getConversationMembers(conversationId: string): Promise<any>;
+    getUserConversations(userId: string): Promise<any>;
 }

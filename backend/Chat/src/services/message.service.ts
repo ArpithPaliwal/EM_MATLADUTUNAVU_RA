@@ -39,4 +39,12 @@ export class MessageService implements IMessageService {
         emitMessageEvents(io, message);
         return message;
     }
+    async getMessages(conversationId: string, userId: string): Promise<any> {
+        // Implementation for retrieving messages
+        if (!conversationId || !userId) {
+            throw new Error("Invalid conversation or user");
+        }
+        const messages = await this.messageRepository.getMessages(conversationId, userId);
+        return messages;
+    }
 }

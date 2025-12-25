@@ -7,5 +7,5 @@ const conversationController = new ConversationController();
 router.use(verifyJWT);
 router.route('/createGroupConversation').post(upload.single('avatar'), conversationController.createGroupConversation);
 router.route('/createPrivateConversation').post(conversationController.createPrivateConversation);
-
+router.route('/getUserConversations').get(conversationController.getUserConversations);
 export default router;

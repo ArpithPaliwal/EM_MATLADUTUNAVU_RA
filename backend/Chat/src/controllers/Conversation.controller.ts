@@ -22,4 +22,10 @@ export class ConversationController implements IConversationController {
     const conversation = await this.conversationService.createGroupConversation({ groupName, memberIds, createdBy, avatarLocalPath });
     return res.status(201).json(new ApiResponse(201, conversation, "Group conversation created successfully"));
   })
+
+  getUserConversations = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const userId = req.user?._id;
+    const conversations = await this.conversationService.getUserConversations(userId);
+    return res.status(200).json(new ApiResponse(200, conversations, "User conversations retrieved successfully"));
+  })
 }

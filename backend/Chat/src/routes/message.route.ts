@@ -10,5 +10,6 @@ router.use(verifyJWT);
 router
   .route("/sendMessage")
   .post(upload.single("attachment"), messageController.sendMessage);
+router.route("/getMessages/:conversationId").get(messageController.getMessages);
 
 export default router;

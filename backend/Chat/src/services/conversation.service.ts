@@ -96,4 +96,8 @@ export class ConversationService implements IConversationService {
         const members = await this.conversationrepository.getConversationMembers(conversationId);
         return members;
     }
+    async getUserConversations(userId: string): Promise<any> {
+        const conversations = await this.conversationrepository.getUserConversations(userId);
+        return conversations;
+    }
 }
