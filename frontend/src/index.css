@@ -1,0 +1,40 @@
+
+
+
+
+@import "tailwindcss";
+
+:root {
+  --primary-background: #ffffff;
+  --secondary-background: #0096c7;
+
+  --primary-text: #0f172a;
+  --secondary-text: #6b7280;
+}
+
+[data-theme="dark"] {
+  --primary-background: #0b0b0b;
+  --secondary-background: #1452d8;
+
+  --primary-text: #f3f4f6;
+  --secondary-text: #9ca3af;
+}
+
+
+
+/* professional theme utility classes */
+.bg-primary {
+  background: var(--primary-background);
+}
+
+.bg-secondary {
+  background: var(--secondary-background);
+}
+
+.text-primary {
+  color: var(--primary-text);
+}
+
+.text-secondary {
+  color: var(--secondary-text);
+}
