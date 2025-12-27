@@ -1,13 +1,23 @@
+import { Link } from "react-router-dom";
+
 function LandingPage() {
   return (
     <div className="w-full  overflow-hidden">
       <div className="">
         <div className="h-full flex justify-center flex-col items-center w-screen gap-10 md:gap-0 ">
           <div className="h-[90%] w-[90%] md:h-[30vh] md:w-[30vw]">
-            <img
+            {/* <img
               src="name_light-theme.svg"
               alt=""
               className="h-full w-full object-contain"
+            /> */}
+            <img
+              src="name_light-theme.svg"
+              className="block  h-full w-full object-contain"
+            />
+            <img
+              src="name_dark-theme.svg"
+              className="hidden  h-full w-full object-contain"
             />
           </div>
           <div className="h-[90%] w-[90%] md:h-[30vh] md:w-[30vw] ">
@@ -37,21 +47,24 @@ function LandingPage() {
 
       <div className="h-full w-full bg-secondary py-10 px-4 md:px-0">
         <div className="w-full flex flex-col md:flex-row justify-center h-full gap-5">
-          <button
-            className="px-5 py-4 bg-white rounded-2xl shadow
+          <Link to="/Signup">
+            <button
+              className="px-5 py-4 bg-white rounded-2xl shadow
                  transition-all duration-200
                  hover:bg-blue-50 hover:shadow-lg hover:-translate-y-1"
-          >
-            Register Me Before I Change My Mind.
-          </button>
-
-          <button
-            className="px-5 py-4 bg-white rounded-2xl shadow
+            >
+              Register Me Before I Change My Mind.
+            </button>
+          </Link>
+          <Link to="/Login">
+            <button
+              className="px-5 py-4 bg-white rounded-2xl shadow
                  transition-all duration-200
                  hover:bg-blue-50 hover:shadow-lg hover:-translate-y-1"
-          >
-            I Already Have an Account, Chill.
-          </button>
+            >
+              I Already Have an Account, Chill.
+            </button>
+          </Link>
         </div>
       </div>
     </div>

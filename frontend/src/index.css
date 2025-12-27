@@ -1,5 +1,20 @@
 
+/* Hide scrollbar globally but keep scrolling */
 
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+html {
+  scrollbar-width: none;
+}
+
+/* Internet Explorer */
+html {
+  -ms-overflow-style: none;
+}
 
 
 @import "tailwindcss";
@@ -38,3 +53,4 @@
 .text-secondary {
   color: var(--secondary-text);
 }
+

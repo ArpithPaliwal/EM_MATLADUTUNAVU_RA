@@ -1,0 +1,94 @@
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const signupSchema = z.object({
+  username: z.string().min(2, "Username must be at least 2 characters long"),
+  
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters long")
+    .regex(
+      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/,
+      "Password must contain at least one letter and one number"
+    ),
+  
+});
+
+function LoginPage() {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } =
+    useForm({
+      resolver: zodResolver(signupSchema),
+    });
+
+  const onSubmit = (data: z.infer<typeof signupSchema>) => {
+    console.log("validated data:", data);
+  };
+
+  return (
+    <div className="relative flex justify-center items-center bg-background overflow-hidden p-4 min-h-screen">
+      <div className="w-full max-w-md bg-accent border border-[#0096c7]/30 p-7 rounded-2xl shadow-lg flex justify-center items-center flex-col">
+        
+        <div className="md:h-[20vh] md:w-[20vw]">
+           
+            <img
+              src="name_light-theme.svg"
+              className="block  h-full w-full object-contain"
+            />
+            <img
+              src="name_dark-theme.svg"
+              className="hidden  h-full w-full object-contain"
+            />
+          </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+          {/* Username */}
+          <div>
+            <label className="block text-sm font-semibold text-text mb-1">
+              Username
+            </label>
+            <input
+              type="text"
+              placeholder="Enter your username"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
+              {...register("username")}
+            />
+            <p className="text-red-500 text-sm mt-1">
+              {errors.username?.message}
+            </p>
+          </div>
+
+          
+
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-semibold text-text mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
+              {...register("password")}
+            />
+            <p className="text-red-500 text-sm mt-1">
+              {errors.password?.message}
+            </p>
+          </div>
+
+          
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-[#0096c7] hover:bg-[#0163D2] text-white font-semibold py-2 rounded-lg transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "Submitting…" : "Back to My Throne"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default LoginPage;
