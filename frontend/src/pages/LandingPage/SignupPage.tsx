@@ -1,6 +1,16 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import Toast from "../../utils/Toast";
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/authSlice";
+import type { RegisterResponseDto } from "../../dto/auth.dto";
+import { registerUser } from "../../API/userApi";
+import { createFormData } from "../../utils/createFormData";
+import { useNavigate } from "react-router";
+import type { ApiError } from "../../dto/apiError";
 
 const signupSchema = z.object({
   username: z.string().min(2, "Username must be at least 2 characters long"),
@@ -25,34 +35,58 @@ const signupSchema = z.object({
       "File must be smaller than 2MB"
     ),
 });
+interface ToastState {
+  type: "success" | "error";
+  message: string;
+}
 
 function SignupPage() {
-  const { register, handleSubmit, formState: { errors, isSubmitting } } =
-    useForm({
-      resolver: zodResolver(signupSchema),
-    });
+  const [toast, setToast] = useState<ToastState | null>(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(signupSchema),
+  });
 
+  const mutation = useMutation({
+    mutationFn: registerUser,
+    onSuccess: (data: RegisterResponseDto) => {
+      dispatch(login({ userData: data })); //remember to chage it
+      setToast({ type: "success", message: "User registered successfully!" });
+      navigate("/Home");
+    },
+    onError: (error: unknown) => {
+      const err = error as ApiError;
+
+      setToast({
+        type: "error",
+        message: err.message ?? "Signup failed",
+      });
+    },
+  });
   const onSubmit = (data: z.infer<typeof signupSchema>) => {
     console.log("validated data:", data);
+    const formData = createFormData(data);
+    mutation.mutate(formData);
   };
 
   return (
     <div className="relative flex justify-center items-center bg-background overflow-hidden p-4 min-h-screen">
       <div className="w-full max-w-md bg-accent border border-[#0096c7]/30 p-7 rounded-2xl shadow-lg flex justify-center items-center flex-col">
-        {/* <h1 className="text-[#0175FE] text-4xl font-bold text-center mb-6">
-            Sign Up
-        </h1> */}
         <div className="md:h-[20vh] md:w-[20vw]">
-           
-            <img
-              src="name_light-theme.svg"
-              className="block  h-full w-full object-contain"
-            />
-            <img
-              src="name_dark-theme.svg"
-              className="hidden  h-full w-full object-contain"
-            />
-          </div>
+          <img
+            src="name_light-theme.svg"
+            className="block  h-full w-full object-contain"
+          />
+          <img
+            src="name_dark-theme.svg"
+            className="hidden  h-full w-full object-contain"
+          />
+        </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
           {/* Username */}
           <div>
@@ -81,9 +115,7 @@ function SignupPage() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
               {...register("email")}
             />
-            <p className="text-red-500 text-sm mt-1">
-              {errors.email?.message}
-            </p>
+            <p className="text-red-500 text-sm mt-1">{errors.email?.message}</p>
           </div>
 
           {/* Password */}
@@ -128,6 +160,13 @@ function SignupPage() {
           </button>
         </form>
       </div>
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }
