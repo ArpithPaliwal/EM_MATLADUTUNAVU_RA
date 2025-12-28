@@ -46,19 +46,19 @@ function LandingPage() {
       </div>
 
       <div className="h-full w-full bg-secondary py-10 px-4 md:px-0">
-        <div className="w-full flex flex-col md:flex-row justify-center h-full gap-5">
+        <div className="w-full flex flex-col md:flex-row justify-center items-center h-full gap-5">
           <Link to="/Signup">
             <button
-              className="px-5 py-4 bg-white rounded-2xl shadow
+              className=" px-5 py-4 bg-white rounded-2xl shadow
                  transition-all duration-200
-                 hover:bg-blue-50 hover:shadow-lg hover:-translate-y-1"
+                 hover:bg-blue-50 hover:shadow-lg hover:-translate-y-1 "
             >
               Register Me Before I Change My Mind.
             </button>
           </Link>
           <Link to="/Login">
             <button
-              className="px-5 py-4 bg-white rounded-2xl shadow
+              className=" px-10 py-4 bg-white rounded-2xl shadow
                  transition-all duration-200
                  hover:bg-blue-50 hover:shadow-lg hover:-translate-y-1"
             >

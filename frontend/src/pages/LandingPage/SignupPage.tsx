@@ -4,9 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import Toast from "../../utils/Toast";
-import { useDispatch } from "react-redux";
-import { login } from "../../redux/authSlice";
-import type { RegisterResponseDto } from "../../dto/auth.dto";
+
 import { registerUser } from "../../API/userApi";
 import { createFormData } from "../../utils/createFormData";
 import { useNavigate } from "react-router";
@@ -42,7 +40,7 @@ interface ToastState {
 
 function SignupPage() {
   const [toast, setToast] = useState<ToastState | null>(null);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const navigate = useNavigate();
   const {
     register,
@@ -54,10 +52,10 @@ function SignupPage() {
 
   const mutation = useMutation({
     mutationFn: registerUser,
-    onSuccess: (data: RegisterResponseDto) => {
-      dispatch(login({ userData: data })); //remember to chage it
-      setToast({ type: "success", message: "User registered successfully!" });
-      navigate("/Home");
+    onSuccess: () => {
+      // dispatch(login({ userData: data })); //remember to chage it
+      setToast({ type: "success", message: "OTP sent successfully!" });
+      navigate("/VerifyOtp");
     },
     onError: (error: unknown) => {
       const err = error as ApiError;
@@ -71,7 +69,7 @@ function SignupPage() {
   const onSubmit = (data: z.infer<typeof signupSchema>) => {
     console.log("validated data:", data);
     const formData = createFormData(data);
-    mutation.mutate(formData);
+    mutation.mutateAsync(formData);
   };
 
   return (
