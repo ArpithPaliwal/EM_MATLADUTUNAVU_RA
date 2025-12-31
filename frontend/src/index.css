@@ -54,3 +54,11 @@ html {
   color: var(--secondary-text);
 }
 
+.border-primary {
+  border-color: var(--secondary-background);
+}
+
+.border-secondary {
+  
+  border-color: var(--primary-text);
+}

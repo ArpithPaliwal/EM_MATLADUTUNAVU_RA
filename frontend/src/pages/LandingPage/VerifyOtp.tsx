@@ -22,7 +22,7 @@ function VerifyOtp() {
         </div>
 
         <OtpInput length={6} onComplete={handleOtpComplete} />
-        
+          <button></button>
       </div>
     </div>
   );

@@ -67,7 +67,7 @@ export default function OtpInput({ length = 6, onComplete }: OtpInputProps) {
           ref={(el) => {
             inputRefs.current[index] = el;
           }}
-          className="h-10 w-10 border-2 border-blue-500 bg-white text-center rounded"
+          className="h-10 w-10 border-2 border-primary bg-white text-center rounded"
         />
       ))}
     </div>
