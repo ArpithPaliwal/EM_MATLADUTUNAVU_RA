@@ -30,10 +30,14 @@ export const initiateRegisterUser = async (formData: FormData):Promise<RegisterR
     } as ApiError;
     }
 }
+type SubmitOtpPayload = {
+  email: string;
+  otpValue: string;
+};
 
-export const submitOtp = async (otpValue:string):Promise<RegisterResponseDto> =>{
+export const submitOtp = async ({ email, otpValue}:SubmitOtpPayload):Promise<RegisterResponseDto> =>{
     try {
-         const res = await api.post("/users/signupVerifyCode", { otp: otpValue }, { withCredentials: true });
+         const res = await api.post("/users/signupVerifyCode", { otp: otpValue, email }, { withCredentials: true });
 
     
     
@@ -57,4 +61,27 @@ export const submitOtp = async (otpValue:string):Promise<RegisterResponseDto> =>
       errors: [],
     } as ApiError;
     }
+}
+export const loginUser = async (data: {username:string,password:string}):Promise<RegisterResponseDto> =>{
+    try {
+         const res = await api.post("/users/login", data, { withCredentials: true });   
+    return res.data.data ;
+    } catch (error:unknown) {
+    if (error instanceof AxiosError && error?.response) {
+      const apiError: ApiError = {
+
+        status: error.response.status,      
+        message: error.response.data.message,
+        errors: error.response.data.errors || [],
+      };
+
+      throw apiError;
+    }
+
+    throw {
+      status: 500,
+      message: "Network error or server is down",
+      errors: [],
+    } as ApiError;
+  }
 }

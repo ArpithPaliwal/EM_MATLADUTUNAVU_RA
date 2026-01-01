@@ -7,7 +7,7 @@ import Toast from "../../utils/Toast";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/authSlice";
 import type { RegisterResponseDto } from "../../dto/auth.dto";
-import { registerUser } from "../../API/userApi";
+import {  loginUser } from "../../API/userApi";
 
 import { useNavigate } from "react-router";
 import type { ApiError } from "../../dto/apiError";
@@ -42,7 +42,7 @@ function LoginPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: registerUser,
+    mutationFn: loginUser,
     onSuccess: (data: RegisterResponseDto) => {
       dispatch(login({ userData: data })); //remember to chage it
       setToast({ type: "success", message: "User Login successfully!" });

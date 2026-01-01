@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import {  z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -46,6 +46,7 @@ function SignupPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    getValues
   } = useForm({
     resolver: zodResolver(signupSchema),
   });
@@ -53,9 +54,10 @@ function SignupPage() {
   const mutation = useMutation({
     mutationFn: initiateRegisterUser,
     onSuccess: () => {
+      const email = getValues("email");
       // dispatch(login({ userData: data })); //remember to chage it
       setToast({ type: "success", message: "OTP sent successfully!" });
-      navigate("/VerifyOtp");
+      navigate("/VerifyOtp",{state:{email}});
     },
     onError: (error: unknown) => {
       const err = error as ApiError;

@@ -7,6 +7,7 @@ import type { ApiError } from "../../dto/apiError";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/authSlice";
 import { submitOtp } from "../../API/userApi";
+import { useLocation } from "react-router-dom";
 
 interface ToastState {
   type: "success" | "error";
@@ -17,7 +18,9 @@ function VerifyOtp() {
   const [toast, setToast] = useState<ToastState | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const location = useLocation();
+  const { state } = location;
+  const { email } = state || {};
   const handleOtpComplete = (otp: string) => {
     console.log("submitted:", otp);
     setOtpValue(otp);
@@ -41,7 +44,7 @@ function VerifyOtp() {
 
   function handleSubmit() {
     if (otpValue.length === 6) {
-      mutation.mutate(otpValue);
+      mutation.mutate({ email, otpValue });
     }
   }
 
