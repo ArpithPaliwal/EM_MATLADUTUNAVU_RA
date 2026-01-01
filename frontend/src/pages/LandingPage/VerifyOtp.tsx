@@ -31,7 +31,7 @@ function VerifyOtp() {
     onSuccess: (data) => {
       setToast({ type: "success", message: "OTP verified successfully!" });
       dispatch(login({ userData: data }));
-      navigate("/SomeNextPage");
+      navigate("/login");
     },
     onError: (error: unknown) => {
       const err = error as ApiError;

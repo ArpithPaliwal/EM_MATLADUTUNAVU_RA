@@ -8,7 +8,9 @@ export const initiateRegisterUser = async (formData: FormData):Promise<RegisterR
       console.log("sent succe");
       
          const res = await api.post("/users/signupInitialize", formData,{ withCredentials: true});
-
+      console.log("check");
+    
+    console.log(res);
     
     
     return res.data.data ;
@@ -41,7 +43,9 @@ export const submitOtp = async ({ email, otpValue}:SubmitOtpPayload):Promise<Reg
     try {
          const res = await api.post("/users/signupVerifyCode", { otp: otpValue, email }, { withCredentials: true });
 
+    console.log("check");
     
+    console.log(res);
     
     return res.data.data ;
     } catch (error:unknown) {
