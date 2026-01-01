@@ -17,7 +17,8 @@ const signupSchema = z.object({
     .string()
     .min(6, "Password must be at least 6 characters long")
     .regex(
-      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/,
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{4,}$/
+,
       "Password must contain at least one letter and one number"
     ),
   avatar: z

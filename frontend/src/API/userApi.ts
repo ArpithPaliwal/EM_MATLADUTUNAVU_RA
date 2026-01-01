@@ -5,7 +5,9 @@ import { AxiosError } from "axios";
 
 export const initiateRegisterUser = async (formData: FormData):Promise<RegisterResponseDto> =>{
     try {
-         const res = await api.post("/users/signupInitiate", formData,{ withCredentials: true});
+      console.log("sent succe");
+      
+         const res = await api.post("/users/signupInitialize", formData,{ withCredentials: true});
 
     
     
