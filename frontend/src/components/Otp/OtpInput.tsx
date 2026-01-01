@@ -5,7 +5,7 @@ interface OtpInputProps {
   onComplete: (otp: string) => void;
 }
 
-export default function OtpInput({ length = 6, onComplete }: OtpInputProps) {
+export default function OtpInput({ length , onComplete }: OtpInputProps) {
   const [otp, setOtp] = useState<string[]>(new Array(length).fill(""));
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -25,7 +25,7 @@ export default function OtpInput({ length = 6, onComplete }: OtpInputProps) {
     newOtp[index] = value;
     setOtp(newOtp);
 
-    if (value && index < length - 1) {
+    if (value && length && index < length - 1) {
       focusInput(index + 1);
     }
 

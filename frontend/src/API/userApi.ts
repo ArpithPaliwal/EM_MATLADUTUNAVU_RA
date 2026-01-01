@@ -3,9 +3,37 @@ import type {  RegisterResponseDto } from "../dto/auth.dto";
 import api from "../utils/axiosInstance";
 import { AxiosError } from "axios";
 
-export const registerUser = async (formData: FormData):Promise<RegisterResponseDto> =>{
+export const initiateRegisterUser = async (formData: FormData):Promise<RegisterResponseDto> =>{
     try {
-         const res = await api.post("/users/register", formData,{ withCredentials: true});
+         const res = await api.post("/users/signupInitiate", formData,{ withCredentials: true});
+
+    
+    
+    return res.data.data ;
+    } catch (error:unknown) {
+        
+
+    if (error instanceof AxiosError && error?.response) {
+      const apiError: ApiError = {
+        status: error.response.status,
+        message: error.response.data.message,
+        errors: error.response.data.errors || [],
+      };
+
+      throw apiError;
+    }
+
+    throw {
+      status: 500,
+      message: "Network error or server is down",
+      errors: [],
+    } as ApiError;
+    }
+}
+
+export const submitOtp = async (otpValue:string):Promise<RegisterResponseDto> =>{
+    try {
+         const res = await api.post("/users/signupVerifyCode", { otp: otpValue }, { withCredentials: true });
 
     
     

@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import Toast from "../../utils/Toast";
 
-import { registerUser } from "../../API/userApi";
+import { initiateRegisterUser } from "../../API/userApi";
 import { createFormData } from "../../utils/createFormData";
 import { useNavigate } from "react-router";
 import type { ApiError } from "../../dto/apiError";
@@ -51,7 +51,7 @@ function SignupPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: registerUser,
+    mutationFn: initiateRegisterUser,
     onSuccess: () => {
       // dispatch(login({ userData: data })); //remember to chage it
       setToast({ type: "success", message: "OTP sent successfully!" });
