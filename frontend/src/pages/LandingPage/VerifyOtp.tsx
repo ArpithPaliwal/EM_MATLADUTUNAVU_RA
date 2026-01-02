@@ -62,7 +62,7 @@ function VerifyOtp() {
         <button
           onClick={handleSubmit}
           disabled={mutation.isPending || otpValue.length !== 6}
-          className="mt-6 w-full py-3 rounded-xl font-semibold bg-[#0f172a] text-white disabled:opacity-60"
+          className="mt-6 w-full py-3 rounded-xl font-semibold bg-secondary text-white disabled:opacity-60"
         >
           {mutation.isPending ? "Arming..." : "Lock In Code"}
         </button>
