@@ -1,9 +1,9 @@
 import type {ApiError} from "../dto/apiError"
 import type {  RegisterResponseDto } from "../dto/auth.dto";
-import api from "../utils/axiosInstance";
+import api from "../utils/axiosInstanceUser";
 import { AxiosError } from "axios";
 
-export const initiateRegisterUser = async (formData: FormData):Promise<RegisterResponseDto> =>{
+export const initiateRegisterUser = async (formData: FormData):Promise<void> =>{
     try {
       console.log("sent succe");
       
