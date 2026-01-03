@@ -9,11 +9,18 @@ import { ConversationParticipantService } from "./conversationParticipant.servic
 
 import { ApiError } from "../utils/apiError.js";
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
+import type { ConversationWithDetails } from "../dtos/responseGetConversatiuonListWithDetails.js";
+import type { ConversationBase } from "../dtos/responseGetConversationListBase.js";
+import type { UserBulkResponse } from "../dtos/userDetailsSummary.dto.js";
+function getTheOtherMemberId(members: string[], userId: string) {
+  return members.find(m => m.toString() !== userId.toString())!;
+}
 
 
 export class ConversationService implements IConversationService {
     constructor(private conversationrepository: IConversationRepository = new ConversationRepository(),
         private userClient: UserClient = new UserClient(),
+
         private conversationParticipantService: IConversationParticipantService = new ConversationParticipantService()
     ) { }
 
@@ -27,7 +34,7 @@ export class ConversationService implements IConversationService {
         if (conversationExists) {
             throw new Error("conversation already exists");
         }
-        
+
         const session = await mongoose.startSession();
         try {
             session.startTransaction();
@@ -52,27 +59,27 @@ export class ConversationService implements IConversationService {
 
     }
     async createGroupConversation(data: createGroupConversationDTO): Promise<any> {
-        const { groupName, memberIds, createdBy,avatarLocalPath} = data;
-        if(Array.isArray(memberIds) && memberIds.length<2){
+        const { groupName, memberIds, createdBy, avatarLocalPath } = data;
+        if (Array.isArray(memberIds) && memberIds.length < 2) {
             throw new ApiError(400, "At least two members are required to create a group conversation");
         }
-        if(!memberIds?.length || !groupName || !avatarLocalPath){
+        if (!memberIds?.length || !groupName || !avatarLocalPath) {
             throw new ApiError(400, "Group name and member ids avatar  required");
         }
 
 
-        const avatarCloudinaryData = await  uploadOnCloudinary(avatarLocalPath );
-            if(!avatarCloudinaryData    ){
-                throw new ApiError(500, "Failed to upload avatar on Cloudinary");
-            }
-        
-            const avatar = avatarCloudinaryData?.secure_url
-            data.avatarLocalPath=avatar;
+        const avatarCloudinaryData = await uploadOnCloudinary(avatarLocalPath);
+        if (!avatarCloudinaryData) {
+            throw new ApiError(500, "Failed to upload avatar on Cloudinary");
+        }
+
+        const avatar = avatarCloudinaryData?.secure_url
+        data.avatarLocalPath = avatar;
         const session = await mongoose.startSession();
         try {
 
             session.startTransaction();
-            
+
             const conversation = await this.conversationrepository.createGroupConversation(data, session);
             await this.conversationParticipantService.createConversationParticipants({ userIds: memberIds, conversationId: conversation._id }, session);
 
@@ -83,7 +90,7 @@ export class ConversationService implements IConversationService {
             await deleteFromCloudinary(avatarCloudinaryData?.public_id);
             await session.abortTransaction();
 
-            
+
 
             throw error;
         } finally {
@@ -96,8 +103,34 @@ export class ConversationService implements IConversationService {
         const members = await this.conversationrepository.getConversationMembers(conversationId);
         return members;
     }
-    async getUserConversations(userId: string): Promise<any> {
-        const conversations = await this.conversationrepository.getUserConversations(userId);
-        return conversations;
+
+    async getUserConversations(userId: string): Promise<ConversationWithDetails[]> {
+        const conversations: ConversationBase[] = await this.conversationrepository.getUserConversations(userId);
+        const partnerIds: string[] = conversations
+            .filter(c => c.type === "direct")
+            .map(c => getTheOtherMemberId(c.members, userId).toString());
+        const partnerInfos: UserBulkResponse = await this.userClient.getUserInfoClient(partnerIds);
+        console.log(partnerInfos);
+
+        const partnerMap = new Map(
+            partnerInfos.users.map((u) => [u._id, u])
+        );
+
+
+        const ConversationsStiched = conversations.map((c) => {
+            if (c.type !== "direct") return c;
+
+            const partnerId = getTheOtherMemberId(c.members, userId).toString();
+
+            return partnerId?{
+                ...c,
+                partner: partnerMap.get(partnerId),
+            }:c;
+        });
+        console.log("stichd",ConversationsStiched);
+        
+        return ConversationsStiched;
     }
+
 }
+

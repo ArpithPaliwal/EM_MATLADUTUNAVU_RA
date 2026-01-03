@@ -17,6 +17,7 @@ import { Types } from "mongoose";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.utils.js";
 import type { LoginDTO } from "../dtos/login.dto.js";
 import { rateLimit } from "../redis/redisRateLimit.service.js";
+import type { UserDetailsSummaryDTO } from "../dtos/userDetailsSummary.dto.js";
 
 const tempFolder = path.resolve("public", "temp");
 export class AuthService implements IAuthService {
@@ -142,6 +143,7 @@ export class AuthService implements IAuthService {
         await this.redisService.del(`signup:${email}`);
 
         return {
+            _id: createdUser._id.toString(),
             username: createdUser.username,
             email: createdUser.email,
             avatar: createdUser.avatar,
@@ -170,6 +172,7 @@ export class AuthService implements IAuthService {
         const refreshToken = generateRefreshToken(user._id.toString());
 
         return {
+            _id: user._id.toString(),
             username: user.username,
             email: user.email,
             avatar: user.avatar,
@@ -238,7 +241,7 @@ export class AuthService implements IAuthService {
         const updatedPassword = await this.authrepository.updatePassword(userId, hashedpassword);
         return updatedPassword;
     }
-    async getUserInBulk(userIds: string[]): Promise<any[]> {
+    async getUserInBulk(userIds: string[]): Promise<UserDetailsSummaryDTO[]> {
         const users = await this.authrepository.getUserInBulk(userIds);
         return users;
     }
