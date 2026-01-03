@@ -6,4 +6,5 @@ export interface IConversationRepository {
     createGroupConversation(data: createGroupConversationDTO,session:any): Promise<any>;
     getConversationMembers(conversationId: string): Promise<any>;
     getUserConversations(userId: string): Promise<any>;
+    updateConversationLastMessage(conversationId: string, messageId: string, messageText: string, senderId: string,createdAt:string): Promise<any>;
 }

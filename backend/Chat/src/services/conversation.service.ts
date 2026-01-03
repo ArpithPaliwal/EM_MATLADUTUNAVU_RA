@@ -131,6 +131,10 @@ export class ConversationService implements IConversationService {
         
         return ConversationsStiched;
     }
+    async updateConversationLastMessage(conversationId: string, messageId: string, messageText: string, senderId: string, createdAt: string): Promise<any> {
+        const updatedConversation = await this.conversationrepository.updateConversationLastMessage(conversationId, messageId, messageText, senderId, createdAt);
+        return updatedConversation;
+    }
 
 }
 

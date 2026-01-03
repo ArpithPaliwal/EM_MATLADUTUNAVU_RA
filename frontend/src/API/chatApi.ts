@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import type {ApiError} from "../dto/apiError"
 
 
-export const initiateRegisterUser = async (formData: FormData):Promise<RegisterResponseDt> =>{
+export const  getChatList= async (formData: FormData):Promise<ChatListResponseDto> =>{
     try {
       console.log("sent succe");
       

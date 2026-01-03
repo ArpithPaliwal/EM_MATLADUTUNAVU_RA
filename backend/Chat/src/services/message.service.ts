@@ -4,8 +4,10 @@ import { MessageRepository } from "../repositories/message.repository.js";
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { emitMessageEvents } from "../sockets/events/message.events.js";
 import  {getIO}  from "../sockets/socket.server.js";
+import type { IConversationService } from "./interfaces/conversation.service.interface.js";
+import { ConversationService } from "./conversation.service.js";
 export class MessageService implements IMessageService {
-    constructor(private messageRepository: IMessageRepository = new MessageRepository()) { }
+    constructor(private messageRepository: IMessageRepository = new MessageRepository(),private conversationService:IConversationService = new ConversationService()) { }
     async createMessage(conversationId: string, senderId: string, text: string, imageOrVideoPath?: string): Promise<any> {
         // Implementation for creating a message
         if (!senderId || !conversationId) {
@@ -35,6 +37,7 @@ export class MessageService implements IMessageService {
             }
         }
         const message = await this.messageRepository.createMessage(messageData.conversationId, messageData.senderId, messageData.text, messageData.imageUrl, messageData.videoUrl, messageData.imagePublicId, messageData.videoPublicId);
+        await this.conversationService.updateConversationLastMessage(conversationId, message._id, text, senderId, message.createdAt);
         const io = getIO();
         emitMessageEvents(io, message);
         return message;

@@ -89,4 +89,15 @@ export class ConversationRepository implements IConversationRepository {
 
         return convo;
     }
+    async updateConversationLastMessage(conversationId: string, messageId: string, messageText: string, senderId: string, createdAt: string): Promise<any> {
+        const updatedConversation = await Conversation.findByIdAndUpdate(
+            conversationId,{ lastMessageId: messageId,
+            lastMessageText: messageText,
+            lastMessageSenderId: senderId,
+            lastMessageCreatedAt: createdAt
+         },
+            { new: true }
+        );
+        return updatedConversation;
+    }
 }
