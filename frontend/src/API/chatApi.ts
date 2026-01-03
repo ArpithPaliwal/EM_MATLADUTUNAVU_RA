@@ -1,13 +1,14 @@
-import api from "../utils/axiosInstanceChat";
+import api from "../utils/axiosinstanceChat.js";
 import { AxiosError } from "axios";
 import type {ApiError} from "../dto/apiError"
+import type { ChatListResponseDto } from "../dto/chatListResponse.dto";
 
 
-export const  getChatList= async (formData: FormData):Promise<ChatListResponseDto> =>{
+export const  getChatList= async ():Promise<ChatListResponseDto[]> =>{
     try {
       console.log("sent succe");
       
-         const res = await api.post("/users/signupInitialize", formData,{ withCredentials: true});
+         const res = await api.post("/users/signupInitialize", { withCredentials: true});
       console.log("check");
     
     console.log(res);
