@@ -70,7 +70,7 @@ export const submitOtp = async ({ email, otpValue}:SubmitOtpPayload):Promise<Reg
 }
 export const loginUser = async (data: {username:string,password:string}):Promise<RegisterResponseDto> =>{
     try {
-         const res = await api.post("/users/login", data, { withCredentials: true });   
+         const res = await api.post("/users/login", data);   
     return res.data.data ;
     } catch (error:unknown) {
     if (error instanceof AxiosError && error?.response) {
