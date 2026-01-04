@@ -26,6 +26,8 @@ export class ConversationController implements IConversationController {
   getUserConversations = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const userId = req.user?._id;
     const conversations = await this.conversationService.getUserConversations(userId);
+    console.log(conversations);
+    
     return res.status(200).json(new ApiResponse(200, conversations, "User conversations retrieved successfully"));
   })
 }

@@ -8,7 +8,7 @@ export const  getConversationsList= async ():Promise<ConversationListResponseDto
     try {
       console.log("sent succe");
       
-         const res = await api.post("/users/signupInitialize", { withCredentials: true});
+         const res = await api.get("/chat/conversations/getUserConversations", { withCredentials: true});
       console.log("check");
     
     console.log(res);
