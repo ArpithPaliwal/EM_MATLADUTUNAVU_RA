@@ -34,6 +34,6 @@ export type GroupConversation = ConversationBase & {
     publicId?: string;
   };
 };
-export type ChatListResponseDto =
+export type ConversationListResponseDto =
   | DirectConversation
   | GroupConversation;

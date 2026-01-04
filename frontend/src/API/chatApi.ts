@@ -1,10 +1,10 @@
 import api from "../utils/axiosinstanceChat.js";
 import { AxiosError } from "axios";
 import type {ApiError} from "../dto/apiError"
-import type { ChatListResponseDto } from "../dto/chatListResponse.dto";
+import type { ConversationListResponseDto } from "../dto/chatListResponse.dto";
 
 
-export const  getChatList= async ():Promise<ChatListResponseDto[]> =>{
+export const  getConversationsList= async ():Promise<ConversationListResponseDto[]> =>{
     try {
       console.log("sent succe");
       

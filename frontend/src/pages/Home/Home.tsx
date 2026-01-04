@@ -1,7 +1,8 @@
-
+import { useConversations } from "../../hooks/useConversationList"
 
 function Home() {
-    
+  const { data: conversations, isLoading ,error} = useConversations();
+
   return (
     <div>
       <div>
