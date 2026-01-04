@@ -12,7 +12,7 @@ export default function ChatList({ selectedChatId, onSelect }: props) {
   if (isLoading) return <div>Loading…</div>;
     if (error) return <div>Error: {error.message}</div>;
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto rounded-2xl ">
       {data?.map((c: ConversationListResponseDto) => (
         <ChatListItem
           key={c.id}
