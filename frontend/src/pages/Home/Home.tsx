@@ -1,15 +1,16 @@
-import { useConversations } from "../../hooks/useConversationList"
+import ChatList from "../../components/chat/ChatList";
+import { useState } from "react";
 
 function Home() {
-  const { data: conversations, isLoading ,error} = useConversations();
-
+  
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   return (
     <div>
       <div>
         Home Page
       </div>
       <div>
-        <div>chatlist</div>
+        <div><div><ChatList selectedChatId={selectedChatId} onSelect={setSelectedChatId} /></div></div>
         <div>chat</div>
       </div>
     </div>
