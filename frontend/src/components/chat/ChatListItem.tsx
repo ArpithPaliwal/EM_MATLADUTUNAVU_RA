@@ -1,4 +1,5 @@
 import type  { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
+import { getConversationDisplay } from "../../utils/conversationDisplay";
 
 type Props = {
   conversation: ConversationListResponseDto;
@@ -11,16 +12,7 @@ export default function ChatListItem({
   onSelect,
   isActive,
 }: Props) {
-  const name =
-    conversation.type === "direct"
-      ? conversation.partner?.username
-      : conversation.groupName;
-
-  const avatar =
-    conversation.type === "direct"
-      ? conversation.partner?.avatar
-      : conversation.groupAvatar?.url;
-
+  const {name , avatar} = getConversationDisplay(conversation)
   const lastMessage = conversation.lastMessageText?? "start the conversation";
 
   return (

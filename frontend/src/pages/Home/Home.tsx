@@ -1,7 +1,7 @@
 import ChatList from "../../components/chat/ChatList";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import ConversationHeader from "../../components/chat/ConversationHeader";
+import ConversationListHeader from "../../components/chat/ConversationListHeader";
 import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
 
 type UserData = {
@@ -47,7 +47,7 @@ function Home() {
       <div className="border-3 border-blue-300 rounded-2xl p-2 flex flex-col ">
         <div>
           <div>
-            <ConversationHeader/>
+            <ConversationListHeader/>
           </div>
           <div className="h-[80vh] w-full max-w-80 border-r border-gray-300 dark:border-gray-600 overflow-y-auto pr-2 flex-1">
             <ChatList
@@ -57,7 +57,9 @@ function Home() {
           </div>
         </div>
         <div>
-          
+          <div>
+
+          </div>
         </div>
       </div>
     </div>
