@@ -2,6 +2,7 @@ import ChatList from "../../components/chat/ChatList";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import ConversationHeader from "../../components/chat/ConversationHeader";
+import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
 
 type UserData = {
   avatar: string;
@@ -17,7 +18,7 @@ type AppState = {
 };
 
 function Home() {
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [selectedChat, setSelectedChat] = useState<ConversationListResponseDto | null>(null);
   const { userData } = useSelector((state: AppState) => state.auth);
   console.log(userData);
 
@@ -50,12 +51,14 @@ function Home() {
           </div>
           <div className="h-[80vh] w-full max-w-80 border-r border-gray-300 dark:border-gray-600 overflow-y-auto pr-2 flex-1">
             <ChatList
-              selectedChatId={selectedChatId}
-              onSelect={setSelectedChatId}
+              selectedChat={selectedChat}
+              onSelect={setSelectedChat}
             />
           </div>
         </div>
-        
+        <div>
+          
+        </div>
       </div>
     </div>
   );

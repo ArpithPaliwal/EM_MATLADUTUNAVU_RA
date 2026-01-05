@@ -2,7 +2,7 @@ import type  { ConversationListResponseDto } from "../../dto/chatListResponse.dt
 
 type Props = {
   conversation: ConversationListResponseDto;
-  onSelect: (id: string) => void;
+  onSelect: (conversation : ConversationListResponseDto) => void;
   isActive: boolean;
 };
 
@@ -27,7 +27,7 @@ export default function ChatListItem({
     <div
       className={`flex items-center gap-3 p-3 cursor-pointer 
         ${isActive ? "bg-blue-100" : "hover:bg-gray-100"}`}
-      onClick={() => onSelect(conversation.id)}
+      onClick={() => onSelect(conversation)}
     >
       {/* Avatar */}
       <img

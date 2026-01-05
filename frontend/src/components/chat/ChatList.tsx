@@ -5,10 +5,10 @@ import ChatListItem from "./ChatListItem";
 import { useEffect } from "react";
 
 type props = {
-  selectedChatId: string | null;
-  onSelect: (id: string) => void;
+  selectedChat: ConversationListResponseDto | null;
+  onSelect: (conversation : ConversationListResponseDto) => void;
 };
-export default function ChatList({ selectedChatId, onSelect }: props) {
+export default function ChatList({ selectedChat, onSelect }: props) {
   const { data, isLoading ,error} = useConversations();
     useEffect(() => {
     if (!data) return;
@@ -25,7 +25,7 @@ export default function ChatList({ selectedChatId, onSelect }: props) {
           key={c.id}
           conversation={c}
           onSelect={onSelect}
-          isActive={c.id === selectedChatId}
+          isActive={c.id === selectedChat?.id}
         />
       ))}
     </div>
