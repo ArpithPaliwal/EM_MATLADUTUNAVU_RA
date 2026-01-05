@@ -1,6 +1,8 @@
 import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
 import { useConversations } from "../../hooks/useConversationList";
+import { joinConversations } from "../../Services/socket";
 import ChatListItem from "./ChatListItem";
+import { useEffect } from "react";
 
 type props = {
   selectedChatId: string | null;
@@ -8,7 +10,12 @@ type props = {
 };
 export default function ChatList({ selectedChatId, onSelect }: props) {
   const { data, isLoading ,error} = useConversations();
+    useEffect(() => {
+    if (!data) return;
 
+    const ids = data.map(c => c.id);   
+    joinConversations(ids);          
+  }, [data]);        
   if (isLoading) return <div>Loading…</div>;
     if (error) return <div>Error: {error.message}</div>;
   return (
