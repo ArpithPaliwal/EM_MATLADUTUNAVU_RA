@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import ConversationListHeader from "../../components/chat/ConversationListHeader";
 import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
+import ConversationArea from "../../components/chat/conversationArea";
 
 type UserData = {
   avatar: string;
@@ -44,7 +45,7 @@ function Home() {
           />
         </div>
       </div>
-      <div className="border-3 border-blue-300 rounded-2xl p-2 flex flex-col ">
+      <div className="border-3 border-blue-300 rounded-2xl p-2 flex justify- ">
         <div>
           <div>
             <ConversationListHeader/>
@@ -56,10 +57,10 @@ function Home() {
             />
           </div>
         </div>
-        <div>
-          <div>
-
-          </div>
+        <div className="flex-2">
+          
+          <ConversationArea conversation={selectedChat}/>
+          
         </div>
       </div>
     </div>

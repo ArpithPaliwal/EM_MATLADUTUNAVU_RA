@@ -13,7 +13,7 @@ export default function MessageInput({ conversationId }: Props) {
       conversationId,
       text,
     });
-
+    // const sendMessage = emitMessage(())
     setText("");
   }
 

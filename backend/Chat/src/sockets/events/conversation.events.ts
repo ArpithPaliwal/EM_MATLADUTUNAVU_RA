@@ -1,4 +1,9 @@
 import { Server, Socket } from "socket.io";
+import { Message } from "../../models/message.model.js";
+import { MessageService } from "../../services/message.service.js";
+import { emitMessageEvents } from "./message.events.js";
+
+const messageService = new MessageService();
 
 
 export const registerConversationEvents = (
@@ -33,4 +38,35 @@ export const registerConversationEvents = (
   socket.on("conversation:inactive", (conversationId: string) => {
     socket.data.activeConversations.delete(conversationId);
   });
+
+  socket.on(
+  "message:send",
+  async (
+    payload: {
+      conversationId: string;
+      senderId: string;
+      text?: string;
+      filePath?: string;   // temp path for image/video (if any)
+    },
+    ack?: (response: any) => void
+  ) => {
+    try {
+      const { conversationId, senderId, text, filePath } = payload;
+
+      const message = await messageService.createMessage(
+        conversationId,
+        senderId,
+        text || "",
+        filePath
+      );
+      emitMessageEvents(io, message);
+      // acknowledge back to the sender
+      ack?.({ ok: true, message });
+
+    } catch (err: any) {
+      console.error("message:send failed:", err);
+      ack?.({ ok: false, error: err.message || "Something went wrong" });
+    }
+  }
+);
 };

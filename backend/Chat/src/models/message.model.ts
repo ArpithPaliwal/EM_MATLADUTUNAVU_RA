@@ -33,11 +33,7 @@ const messageSchema = new Schema<IMessage>(
       trim: true,   
   },
 
-    messageSeenStatus: {  
-      type: String,
-      enum: ["delivered", "read"],
-      default: "delivered",
-    },
+    
   },
   {
     timestamps: true,

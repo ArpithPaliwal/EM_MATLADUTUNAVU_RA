@@ -13,7 +13,7 @@ export default function ChatList({ selectedChat, onSelect }: props) {
     useEffect(() => {
     if (!data) return;
 
-    const ids = data.map(c => c.id);   
+    const ids = data.map(c => c._id);   
     joinConversations(ids);          
   }, [data]);        
   if (isLoading) return <div>Loading…</div>;
@@ -22,10 +22,10 @@ export default function ChatList({ selectedChat, onSelect }: props) {
     <div className="h-full overflow-y-auto rounded-2xl ">
       {data?.map((c: ConversationListResponseDto) => (
         <ChatListItem
-          key={c.id}
+          key={c._id}
           conversation={c}
           onSelect={onSelect}
-          isActive={c.id === selectedChat?.id}
+          isActive={c?._id === selectedChat?._id}
         />
       ))}
     </div>

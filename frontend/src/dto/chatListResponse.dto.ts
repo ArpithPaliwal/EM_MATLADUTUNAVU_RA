@@ -1,5 +1,5 @@
 export type ConversationBase = {
-  id: string;
+  _id: string;
   type: "direct" | "group";
 
   members: string[];
