@@ -7,6 +7,7 @@ import ConversationArea from "../../components/chat/conversationArea";
 
 type UserData = {
   avatar: string;
+  _id:string
 };
 
 type AuthState = {
@@ -59,7 +60,7 @@ function Home() {
         </div>
         <div className="flex-2">
           
-          <ConversationArea conversation={selectedChat}/>
+          <ConversationArea conversation={selectedChat} userId={userData?._id}/>
           
         </div>
       </div>

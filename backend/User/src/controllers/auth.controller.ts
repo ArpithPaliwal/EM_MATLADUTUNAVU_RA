@@ -81,6 +81,8 @@ export class AuthController implements IAuthController {
         sameSite: "none",
         path: '/'
       });
+      console.log(user);
+      
       return res.status(200).json(
         new ApiResponse(200, userData, "Login successful")
       );

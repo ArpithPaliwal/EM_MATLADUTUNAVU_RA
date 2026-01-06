@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useMessages } from "../../hooks/useMessages";
 import { useSelector } from "react-redux";
-import { onMessageNew, onMessageDeleted } from "../../Services/socket";
+import { onMessageNew, onMessageDeleted, activeConversation } from "../../Services/socket";
 import { useQueryClient } from "@tanstack/react-query";
 import type { MessageResponseDto } from "../../dto/messages.dto";
 
@@ -28,6 +28,7 @@ export default function MessageList({ conversationId }: Props) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    activeConversation(conversationId)
     const offNew = onMessageNew((msg: MessageResponseDto) => {
       queryClient.setQueryData<MessageResponseDto[]>(
         ["messages", conversationId],

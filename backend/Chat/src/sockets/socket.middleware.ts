@@ -10,6 +10,8 @@ export const socketAuthMiddleware = (
 
   // 1. Manually parse the raw cookie string
   const rawCookies = req.headers.cookie;
+  console.log("raw cookies",rawCookies);
+  
   if (rawCookies) {
     req.cookies = cookie.parse(rawCookies);
   } else {

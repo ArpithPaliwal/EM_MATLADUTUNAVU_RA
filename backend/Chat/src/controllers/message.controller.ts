@@ -1,9 +1,11 @@
-import type { Request, Response } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import type { IMessageControllerInterface } from "./interfaces/message.contoller.interface.js";
 import type { IMessageService } from "../services/interfaces/message.service.interface.js";
 import { MessageService } from "../services/message.service.js";
+import type { ParamsDictionary } from "express-serve-static-core";
+import type { ParsedQs } from "qs";
 
 
 
@@ -47,6 +49,23 @@ export class MessageController implements IMessageControllerInterface {
 
     }
     )
+    uploadFile = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        
+        const userId = req.user?._id;
 
+        if (!userId) {
+            res.status(400).json(
+                new ApiResponse(400, null, "Missing required fields")
+            );
+            return;
+        }
+        
+        const ImageOrVideoPath = req.file?.path || "";
+        res.status(200).json(
+            new ApiResponse(200, ImageOrVideoPath, "UPLOADED TO MULTER successfully")
+        );
+
+    }
+    )
 }
 

@@ -1,13 +1,19 @@
 import { io, Socket } from "socket.io-client";
 import type { MessageResponseDto } from "../dto/messages.dto";
 
-export const socket: Socket = io(import.meta.env.VITE_SOCKET_URL as string, {
+
+
+export const socket: Socket = io(import.meta.env.VITE_API_BASE_CHAT_SOCKET as string, {
   withCredentials: true,
-  autoConnect: false,
+  autoConnect: true,
+  auth: {
+    token: localStorage.getItem("accessToken")
+  }
 });
 
 export const connectSocket = () => {
   if (!socket.connected) socket.connect();
+  console.log("SOCKET CONNECTED:", socket.id);
 };
 
 export const disconnectSocket = () => {
@@ -51,7 +57,7 @@ export const onMessageDeleted = (cb: (payload: { messageId: string }) => void) =
 
 
 
-// socket.emit("message:send", payload<SendMessageDto>, (res: any) => {
+// socket.emit("message:send", payload, (res: any) => {
 //   if (!res?.ok) {
 //     console.error("Message failed:", res?.error);
     
@@ -61,3 +67,19 @@ export const onMessageDeleted = (cb: (payload: { messageId: string }) => void) =
 
 //   console.log("Delivered:", res.message);
 // });
+export const sendMessage = (
+  payload: unknown,
+  cb?: (message: unknown) => void,
+  onError?: (err: unknown) => void
+) => {
+  socket.emit("message:send", payload, (res:any) => {
+    console.log("SERVER RECEIVED message:send");
+    if (!res?.ok) {
+      console.error("Message failed:", res?.error);
+      onError?.(res?.error);
+      return;
+    }
+
+    cb?.(res.message);
+  });
+};

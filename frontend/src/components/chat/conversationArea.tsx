@@ -5,9 +5,10 @@ import MessageInput from "./MessageInput";
 
 type Props = {
   conversation: ConversationListResponseDto | null;
+  userId:string | undefined
 };
 
-export default function ConversationArea({ conversation }: Props) {
+export default function ConversationArea({ conversation ,userId}: Props) {
   if (!conversation) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
@@ -25,7 +26,7 @@ export default function ConversationArea({ conversation }: Props) {
       </div>
 
       <div className="border-t">
-        <MessageInput conversationId={conversation._id} />
+        <MessageInput conversationId={conversation._id} senderId={userId} />
       </div>
     </div>
   );
