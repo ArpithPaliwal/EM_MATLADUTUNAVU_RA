@@ -10,7 +10,7 @@ type Props = {
 };
 
 type UserData = {
-  id: string;
+  _id: string;
 };
 
 type AuthState = {
@@ -61,7 +61,7 @@ export default function MessageList({ conversationId }: Props) {
   return (
     <div className="flex flex-col gap-2 p-3 overflow-y-auto">
       {data?.map((msg) => {
-        const isMine = msg.senderId === userData?.id;
+        const isMine = msg.senderId === userData?._id;
 
         return (
           <div
