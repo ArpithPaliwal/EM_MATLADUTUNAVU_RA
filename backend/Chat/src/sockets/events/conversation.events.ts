@@ -2,9 +2,10 @@ import { Server, Socket } from "socket.io";
 import { Message } from "../../models/message.model.js";
 import { MessageService } from "../../services/message.service.js";
 import { emitMessageEvents } from "./message.events.js";
+import { ConversationParticipantService } from "../../services/conversationParticipant.service.js";
 
 const messageService = new MessageService();
-
+const conversationParticipantService = new ConversationParticipantService();
 
 export const registerConversationEvents = (
   io: Server,
@@ -69,4 +70,16 @@ export const registerConversationEvents = (
     }
   }
 );
+
+socket.on(
+  "conversationParticipant:unreadCount",
+  async (conversationParticipantId: string) => {
+    if (!conversationParticipantId) return;
+
+    await conversationParticipantService.resetUnreadCounts(conversationParticipantId);
+  }
+);
+
 };
+
+

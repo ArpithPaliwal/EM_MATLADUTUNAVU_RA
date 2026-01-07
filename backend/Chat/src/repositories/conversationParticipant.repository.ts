@@ -23,4 +23,11 @@ export class ConversationParticipantRepository implements IConversationParticipa
         );
 
     }
+    async resetUnreadCounts(_id: string): Promise<void> {
+        await ConversationParticipant.updateOne(
+            { _id },                 
+            { $set: { unreadCount: 0 } }   
+        );
+    }
+
 }

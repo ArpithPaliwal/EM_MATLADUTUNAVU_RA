@@ -19,5 +19,8 @@ export class ConversationParticipantService implements IConversationParticipantS
         console.log("SERVICE DATA RECEIVED:", data);
         await this.conversationParticipantRepository.updateConversationParticipants(_id,userId,conversationId,senderId);
     }
+    async resetUnreadCounts(conversationParticipantId: string): Promise<void> {
+        await this.conversationParticipantRepository.resetUnreadCounts(conversationParticipantId)
+    }
 }
 
