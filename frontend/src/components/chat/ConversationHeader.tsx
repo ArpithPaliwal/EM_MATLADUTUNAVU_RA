@@ -12,7 +12,7 @@ export default function ConversationHeader({ conversation }: Props) {
     
 
   return (
-    <div className="flex items-center gap-3 h-16 px-4 border-b bg-white">
+    <div className="flex items-center gap-3 h-16 px-4 rounded-xl bg-gray-300">
       <img
         src={avatar}
         alt={name}

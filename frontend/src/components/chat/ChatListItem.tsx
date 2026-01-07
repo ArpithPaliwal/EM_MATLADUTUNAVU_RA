@@ -18,7 +18,7 @@ export default function ChatListItem({
   return (
     <div
       className={`flex items-center gap-3 p-3 cursor-pointer 
-        ${isActive ? "bg-blue-100" : "hover:bg-gray-100"}`}
+        ${isActive ? "bg-secondary" : "hover:bg-blue-100"}`}
       onClick={() => onSelect(conversation)}
     >
       {/* Avatar */}

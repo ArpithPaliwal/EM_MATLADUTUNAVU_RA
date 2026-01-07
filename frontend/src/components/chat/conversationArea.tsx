@@ -18,10 +18,10 @@ export default function ConversationArea({ conversation ,userId}: Props) {
   }
 
   return (
-    <div className="flex flex-col h-full ">
+    <div className="flex flex-col h-full min-h-0">
       <ConversationHeader conversation={conversation} />
 
-      <div className="flex-1 overflow-y-auto px-3 py-2">
+      <div className="flex-1 overflow-y-auto px-3 py-2 min-h-0">
         <MessageList conversationId={conversation._id} />
       </div>
 

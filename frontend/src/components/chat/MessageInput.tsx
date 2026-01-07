@@ -52,6 +52,7 @@ export default function MessageInput({ conversationId, senderId }: Props) {
       <input
         type="file"
         accept="image/*,video/*"
+        name="userUploadedMediaFile"
         onChange={e => setFile(e.target.files?.[0] || null)}
       />
 
@@ -64,7 +65,7 @@ export default function MessageInput({ conversationId, senderId }: Props) {
       />
 
       <button
-        className="bg-blue-500 text-white px-4 py-2 rounded-xl"
+        className="bg-secondary text-white px-4 py-2 rounded-xl"
         onClick={send}
         disabled={uploadMutation.isPending}
       >

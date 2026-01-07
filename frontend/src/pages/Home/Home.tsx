@@ -7,7 +7,7 @@ import ConversationArea from "../../components/chat/conversationArea";
 
 type UserData = {
   avatar: string;
-  _id:string
+  _id: string;
 };
 
 type AuthState = {
@@ -20,12 +20,14 @@ type AppState = {
 };
 
 function Home() {
-  const [selectedChat, setSelectedChat] = useState<ConversationListResponseDto | null>(null);
+  const [selectedChat, setSelectedChat] =
+    useState<ConversationListResponseDto | null>(null);
+
   const { userData } = useSelector((state: AppState) => state.auth);
-  console.log(userData);
 
   return (
-    <div className="px-3  overflow-hidden ">
+    <div className="px-3 h-screen overflow-hidden">
+      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="h-10 w-32 md:h-12 md:w-40">
           <img
@@ -46,22 +48,24 @@ function Home() {
           />
         </div>
       </div>
-      <div className="border-3 border-blue-300 rounded-2xl p-2 flex justify- ">
-        <div>
-          <div>
-            <ConversationListHeader/>
-          </div>
-          <div className="h-[80vh] w-full max-w-80 border-r border-gray-300 dark:border-gray-600 overflow-y-auto pr-2 flex-1">
-            <ChatList
-              selectedChat={selectedChat}
-              onSelect={setSelectedChat}
-            />
+
+      {/* Main chat layout */}
+      <div className="border-3 border-blue-300 rounded-2xl p-2 flex gap-2 h-[85vh] min-h-0">
+        {/* Chat list */}
+        <div className="flex flex-col w-80 min-w-64">
+          <ConversationListHeader />
+
+          <div className="h-full border-r border-gray-300 dark:border-gray-600 overflow-y-auto pr-2">
+            <ChatList selectedChat={selectedChat} onSelect={setSelectedChat} />
           </div>
         </div>
-        <div className="flex-2">
-          
-          <ConversationArea conversation={selectedChat} userId={userData?._id}/>
-          
+
+        {/* Conversation area */}
+        <div className="flex-1 min-h-0 ">
+          <ConversationArea
+            conversation={selectedChat}
+            userId={userData?._id}
+          />
         </div>
       </div>
     </div>

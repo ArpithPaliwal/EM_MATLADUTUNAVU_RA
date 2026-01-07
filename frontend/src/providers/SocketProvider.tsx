@@ -24,7 +24,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
       console.log(" socket disconnected");
     }
 
-    return () => disconnectSocket();
+    
   }, [isLoggedIn]);
 
   return <>{children}</>;

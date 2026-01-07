@@ -39,7 +39,7 @@ export default function MessageList({ conversationId }: Props) {
     const offDeleted = onMessageDeleted(({ messageId }: { messageId: string }) => {
       queryClient.setQueryData<MessageResponseDto[]>(
         ["messages", conversationId],
-        (old = []) => old.filter((m) => m.id !== messageId)
+        (old = []) => old.filter((m) => m._id !== messageId)
       );
     });
 
@@ -56,19 +56,22 @@ export default function MessageList({ conversationId }: Props) {
 
   if (!data || data.length === 0)
     return <div className="p-4 text-sm text-gray-500">No messages yet. Start the conversation.</div>;
-
+  {console.log(data)}
 
   return (
-    <div className="flex flex-col gap-2 p-3 overflow-y-auto">
+    <div className="flex flex-col gap-2 p-3 overflow-y-auto  "
+    >
+      
+      
       {data?.map((msg) => {
         const isMine = msg.senderId === userData?._id;
 
         return (
           <div
-            key={msg.id}
+            key={msg?._id}
             className={`max-w-xs px-3 py-2 rounded-xl text-sm ${
               isMine
-                ? "self-end bg-blue-500 text-white"
+                ? "self-end bg-secondary text-white"
                 : "self-start bg-gray-200 text-gray-900"
             }`}
           >

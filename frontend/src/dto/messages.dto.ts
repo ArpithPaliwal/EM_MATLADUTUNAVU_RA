@@ -1,5 +1,5 @@
 export interface MessageResponseDto {
-  id: string;
+  _id: string;
   conversationId: string;
   senderId: string;
   text?: string;

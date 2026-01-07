@@ -44,10 +44,11 @@ export const uploadMedia = async (
   file: File
 ): Promise<{ filePath: string }> => {
   try {
-    const form = createFormData({ file });
+    const form = createFormData({ userUploadedMediaFile: file });
+
 
     const res = await api.post(
-      "/uploads/message",
+      "/chat/messages/uploadFile",
       form,
       { withCredentials: true }
     );
