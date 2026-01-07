@@ -67,16 +67,19 @@ export const onMessageDeleted = (cb: (payload: { messageId: string }) => void) =
 
 //   console.log("Delivered:", res.message);
 // });
+type SendMessageAck =
+  | { ok: true; message: MessageResponseDto }
+  | { ok: false; error: string };
+
+
 export const sendMessage = (
   payload: unknown,
-  cb?: (message: unknown) => void,
+  cb?: (msg: MessageResponseDto) => void,
   onError?: (err: unknown) => void
 ) => {
-  socket.emit("message:send", payload, (res:any) => {
-    console.log("SERVER RECEIVED message:send");
-    if (!res?.ok) {
-      console.error("Message failed:", res?.error);
-      onError?.(res?.error);
+  socket.emit("message:send", payload, (res: SendMessageAck) => {
+    if (!res.ok) {
+      onError?.(res.error);
       return;
     }
 

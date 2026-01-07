@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type  { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
 import { getConversationDisplay } from "../../utils/conversationDisplay";
 
@@ -15,6 +16,9 @@ export default function ChatListItem({
   const {name , avatar} = getConversationDisplay(conversation)
   const lastMessage = conversation.lastMessageText?? "start the conversation";
 
+  useEffect(()=>{
+
+  },[conversation.unreadCount])
   return (
     <div
       className={`flex items-center gap-3 p-3 cursor-pointer 

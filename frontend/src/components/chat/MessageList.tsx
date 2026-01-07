@@ -29,6 +29,7 @@ export default function MessageList({ conversationId }: Props) {
 
   useEffect(() => {
     activeConversation(conversationId)
+    
     const offNew = onMessageNew((msg: MessageResponseDto) => {
       queryClient.setQueryData<MessageResponseDto[]>(
         ["messages", conversationId],

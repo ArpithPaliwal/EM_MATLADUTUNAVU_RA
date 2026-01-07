@@ -47,22 +47,22 @@ export const emitMessageEvents = async (
   const allMembers = await conversationService.getConversationMembers(
     conversationId
   );
-  for (const member of allMembers) {
-  if (member.userId === senderId) continue;
+  for (const memberId of allMembers) {
+  if (memberId === senderId) continue;
 
-  const isActive = activeUsers.has(member.userId);
+  const isActive = activeUsers.has(memberId);
 
   if (!isActive) {
-    io.to(`user:${member.userId}`).emit("conversation:unreadUpdate", {
+    io.to(`user:${memberId}`).emit("conversation:unreadUpdate", {
       conversationId,
       incrementBy: 1,
     });
-    console.log(`🔔 DEBUG: Emitted 'conversation:unreadUpdate' to user:${member.userId} for conversation:${conversationId}`);
+    console.log(`🔔 DEBUG: Emitted 'conversation:unreadUpdate' to user:${memberId} for conversation:${conversationId}`);
   }
 
     await conversationParticipantService.updateConversationParticipants(
       message,
-      member.userId
+      memberId
     );
   }
 }

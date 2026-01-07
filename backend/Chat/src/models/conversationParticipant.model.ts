@@ -17,19 +17,19 @@ const conversationParticipantSchema =
         required: true,
         index: true,
       },
-      senderId: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
+      // senderId: {
+      //   type: Schema.Types.ObjectId,
+      //   ref: "User",
+      // },
       unreadCount: {
         type: Number,
         default: 0,
       },
 
-      lastReadMessageId: {
-        type: Schema.Types.ObjectId,
-        ref: "Message",
-      },
+      // lastReadMessageId: {
+      //   type: Schema.Types.ObjectId,
+      //   ref: "Message",
+      // },
 
       
 
