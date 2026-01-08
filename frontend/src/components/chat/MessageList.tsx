@@ -28,15 +28,23 @@ type AppState = {
   auth: AuthState;
 };
 
+// ✅ helper — ONLY Mongo ObjectIds are allowed for read cursor
+const isMongoObjectId = (id: string) => /^[a-f\d]{24}$/i.test(id);
+
 export default function MessageList({ conversationId }: Props) {
   const { data, isLoading, isError } = useMessages(conversationId);
   const { userData } = useSelector((state: AppState) => state.auth);
   const queryClient = useQueryClient();
+
+  // 🔑 read cursor (persisted messages only)
   const latestReadIdRef = useRef<string | null>(null);
+
+  /* --------------------------------------------------
+     1️⃣ JOIN / LEAVE + SOCKET LISTENERS
+  -------------------------------------------------- */
   useEffect(() => {
     if (!conversationId) return;
 
-    // ✅ only emit if socket is connected
     activeConversation(conversationId);
 
     const offNew = onMessageNew((msg) => {
@@ -49,7 +57,11 @@ export default function MessageList({ conversationId }: Props) {
           return [...old, msg];
         }
       );
-      latestReadIdRef.current = msg._id;
+
+      // 🔒 advance cursor ONLY for persisted messages
+      if (isMongoObjectId(msg._id)) {
+        latestReadIdRef.current = msg._id;
+      }
     });
 
     const offDeleted = onMessageDeleted(({ messageId }) => {
@@ -61,63 +73,84 @@ export default function MessageList({ conversationId }: Props) {
 
     return () => {
       inActiveConversation(conversationId);
-
       offNew();
       offDeleted();
     };
   }, [conversationId, queryClient, userData]);
+
+  /* --------------------------------------------------
+     2️⃣ INITIAL READ SYNC (OPEN / REFRESH FIX)
+     Mark last persisted message as read once
+  -------------------------------------------------- */
   useEffect(() => {
     if (!data || data.length === 0) return;
 
-    const lastMessageId = data[data.length - 1]._id;
+    // find last Mongo-persisted message
+    const lastPersisted = [...data]
+      .reverse()
+      .find((m) => isMongoObjectId(m._id));
 
-    latestReadIdRef.current = lastMessageId;
+    if (!lastPersisted) return;
+
+    latestReadIdRef.current = lastPersisted._id;
 
     socket.emit("conversation:read", {
       conversationId,
-      lastReadMessageId: lastMessageId,
+      lastReadMessageId: lastPersisted._id,
     });
   }, [conversationId, data]);
 
+  /* --------------------------------------------------
+     3️⃣ READ HEARTBEAT (LIVENESS GUARANTEE)
+     Keeps cursor moving even if messages keep coming
+  -------------------------------------------------- */
   useEffect(() => {
     if (!conversationId) return;
 
     const interval = setInterval(() => {
-      if (!latestReadIdRef.current) return;
+      const id = latestReadIdRef.current;
+      if (!id || !isMongoObjectId(id)) return;
 
       socket.emit("conversation:read", {
         conversationId,
-        lastReadMessageId: latestReadIdRef.current,
+        lastReadMessageId: id,
       });
-    }, 3000); // ✅ 3-second heartbeat
+    }, 3000); // ⏱️ 3 seconds
 
     return () => clearInterval(interval);
   }, [conversationId]);
-  if (isLoading) return <div className="p-4 text-sm">Loading messages…</div>;
 
-  if (isError)
+  /* --------------------------------------------------
+     4️⃣ RENDER
+  -------------------------------------------------- */
+  if (isLoading) {
+    return <div className="p-4 text-sm">Loading messages…</div>;
+  }
+
+  if (isError) {
     return (
-      <div className="p-4 text-sm text-red-500">Failed to load messages.</div>
+      <div className="p-4 text-sm text-red-500">
+        Failed to load messages.
+      </div>
     );
+  }
 
-  if (!data || data.length === 0)
+  if (!data || data.length === 0) {
     return (
       <div className="p-4 text-sm text-gray-500">
         No messages yet. Start the conversation.
       </div>
     );
-  {
-    console.log(data);
   }
 
   return (
-    <div className="flex flex-col gap-2 p-3 overflow-y-auto  ">
-      {data?.map((msg) => {
+    <div className="flex flex-col gap-2 p-3 overflow-y-auto">
+      {data.map((msg) => {
         const isMine = msg.senderId === userData?._id;
 
         return (
           <div
-            key={msg?._id}
+            key={msg._id}
             className={`max-w-xs px-3 py-2 rounded-xl text-sm ${
               isMine
                 ? "self-end bg-secondary text-white"
