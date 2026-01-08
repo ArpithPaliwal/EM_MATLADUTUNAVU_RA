@@ -13,7 +13,7 @@ export default function ChatList({ selectedChat, onSelect }: props) {
     useEffect(() => {
     if (!data) return;
 
-    const ids = data.map(c => c._id);   
+    const ids = data?.map(c => c._id);   
     joinConversations(ids);          
   }, [data]);        
   if (isLoading) return <div>Loading…</div>;

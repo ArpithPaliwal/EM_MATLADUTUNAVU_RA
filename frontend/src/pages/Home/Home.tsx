@@ -1,9 +1,11 @@
 import ChatList from "../../components/chat/ChatList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ConversationListHeader from "../../components/chat/ConversationListHeader";
 import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
 import ConversationArea from "../../components/chat/conversationArea";
+import { useQueryClient } from "@tanstack/react-query";
+import { onUnreadUpdate } from "../../Services/socket";
 
 type UserData = {
   avatar: string;
@@ -24,6 +26,35 @@ function Home() {
     useState<ConversationListResponseDto | null>(null);
 
   const { userData } = useSelector((state: AppState) => state.auth);
+  const queryClient = useQueryClient();
+
+
+useEffect(() => {
+  const cleanup = onUnreadUpdate(({ conversationId, incrementBy }) => {
+    // 🔒 RECTIFICATION
+    if (selectedChat?._id === conversationId) {
+      return;
+    }
+
+    queryClient.setQueryData(
+      ["conversations"],
+      (oldData: ConversationListResponseDto[] | undefined) => {
+        if (!oldData) return oldData;
+
+        return oldData.map((conv) =>
+          conv._id === conversationId
+            ? {
+                ...conv,
+                unreadCount: conv.unreadCount + incrementBy,
+              }
+            : conv
+        );
+      }
+    );
+  });
+
+  return cleanup;
+}, [queryClient, selectedChat?._id]);
 
   return (
     <div className="px-3 h-screen overflow-hidden">
@@ -61,7 +92,7 @@ function Home() {
         </div>
 
         {/* Conversation area */}
-        <div className="flex-1 min-h-0 ">
+        <div className="flex-1 min-h-0">
           <ConversationArea
             conversation={selectedChat}
             userId={userData?._id}

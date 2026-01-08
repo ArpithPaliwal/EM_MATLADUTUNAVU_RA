@@ -1,15 +1,16 @@
 import { io, Socket } from "socket.io-client";
 import type { MessageResponseDto } from "../dto/messages.dto";
 
-
-
-export const socket: Socket = io(import.meta.env.VITE_API_BASE_CHAT_SOCKET as string, {
-  withCredentials: true,
-  autoConnect: true,
-  auth: {
-    token: localStorage.getItem("accessToken")
+export const socket: Socket = io(
+  import.meta.env.VITE_API_BASE_CHAT_SOCKET as string,
+  {
+    withCredentials: true,
+    autoConnect: true,
+    auth: {
+      token: localStorage.getItem("accessToken"),
+    },
   }
-});
+);
 
 export const connectSocket = () => {
   if (!socket.connected) socket.connect();
@@ -21,49 +22,41 @@ export const disconnectSocket = () => {
 };
 
 export const joinConversations = (conversationIds: string[]) => {
-  if (!socket.connected) return; {
-    socket.emit("conversation:join", conversationIds)
+  if (!socket.connected) return;
+  {
+    socket.emit("conversation:join", conversationIds);
   }
-}
+};
 
 export const activeConversation = (conversationId: string) => {
   if (!socket.connected) return;
   socket.emit("conversation:active", conversationId);
-  console.log("activeconnection",conversationId);
-  
+  console.log("activeconnection", conversationId);
 };
 
 export const inActiveConversation = (conversationId: string) => {
   if (!socket.connected) return;
   socket.emit("conversation:inactive", conversationId);
-  console.log("INNNNactiveconnection",conversationId);
+  console.log("INNNNactiveconnection", conversationId);
 };
-
-
-
-
 
 export const onMessageNew = (cb: (msg: MessageResponseDto) => void) => {
   socket.on("message:new", cb);
 
-
   return () => socket.off("message:new", cb);
 };
 
-export const onMessageDeleted = (cb: (payload: { messageId: string }) => void) => {
+export const onMessageDeleted = (
+  cb: (payload: { messageId: string }) => void
+) => {
   socket.on("message:deleted", cb);
 
   return () => socket.off("message:deleted", cb);
 };
 
-
-
-
-
 type SendMessageAck =
   | { ok: true; message: MessageResponseDto }
   | { ok: false; error: string };
-
 
 export const sendMessage = (
   payload: unknown,
@@ -80,10 +73,17 @@ export const sendMessage = (
   });
 };
 
-export const resetUnread = (
-  conversationParticipantId:string|undefined
-)=>{
-  socket.emit("conversationParticipant:unreadCount",conversationParticipantId)
-  
-}
+export const resetUnread = (conversationParticipantId: string | undefined) => {
+  socket.emit("conversationParticipant:unreadCount", conversationParticipantId);
+};
 
+
+export const onUnreadUpdate = (
+  cb: (payload: { conversationId: string; incrementBy: number }) => void
+) => {
+  socket.on("conversation:unreadUpdate", cb);
+
+  return () => {
+    socket.off("conversation:unreadUpdate", cb);
+  };
+};

@@ -9,6 +9,11 @@ export const socketAuthMiddleware = (
   const req = socket.request as any;
 
   // 1. Manually parse the raw cookie string
+  // ✅ SUPPORT socket.handshake.auth.token
+if (!req.cookies?.accessToken && socket.handshake.auth?.token) {
+  req.cookies.accessToken = socket.handshake.auth.token;
+}
+
   const rawCookies = req.headers.cookie;
   console.log("raw cookies",rawCookies);
   

@@ -7,7 +7,7 @@ export const handleSocketConnection = (
     socket: Socket
 ) => {
     const userId = socket.data.userId;
-    socket.data.activeConversations = new Set<string>();
+    // socket.data.activeConversations = new Set<string>();
     socket.join(`user:${userId}`);
 
     registerConversationEvents(io, socket);

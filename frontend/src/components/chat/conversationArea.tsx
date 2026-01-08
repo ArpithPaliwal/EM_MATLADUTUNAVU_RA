@@ -2,7 +2,9 @@ import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto
 import ConversationHeader from "./ConversationHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
-import { useQueryClient } from "@tanstack/react-query";
+import {  useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { activeConversation, inActiveConversation } from "../../Services/socket";
 
 
 type Props = {
@@ -11,7 +13,43 @@ type Props = {
 };
 
 export default function ConversationArea({ conversation, userId }: Props) {
-  const queryClient = useQueryClient();
+   const queryClient = useQueryClient();
+  useEffect(() => {
+  if (!conversation) return;
+  if (conversation.unreadCount === 0) return;
+
+  queryClient.setQueryData<ConversationListResponseDto[]>(
+    ["conversations"],
+    (old) =>
+      old?.map((c) =>
+        c._id === conversation._id ? { ...c, unreadCount: 0 } : c
+      )
+  );
+}, [conversation,queryClient]);
+
+  useEffect(() => {
+  if (!conversation?._id) return;
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") {
+      activeConversation(conversation._id);
+    } else {
+      inActiveConversation(conversation._id);
+    }
+  };
+
+  // initial state
+  handleVisibilityChange();
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  return () => {
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    inActiveConversation(conversation._id);
+  };
+}, [conversation?._id]);
+
+ 
   if (!conversation) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
@@ -19,22 +57,7 @@ export default function ConversationArea({ conversation, userId }: Props) {
       </div>
     );
   }
-  if (conversation) {
-  if (conversation.unreadCount > 0) {
-    queryClient.setQueryData<ConversationListResponseDto[]>(
-      ['conversations'],
-      (oldData) => {
-        if (!oldData) return oldData;
 
-        return oldData.map((item) =>
-          item._id === conversation._id
-            ? { ...item, unreadCount: 0 }
-            : item
-        );
-      }
-    );
-  }
-}
 
   return (
     <div className="flex flex-col h-full min-h-0">
