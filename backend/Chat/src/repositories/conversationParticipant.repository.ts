@@ -25,9 +25,14 @@ export class ConversationParticipantRepository implements IConversationParticipa
     }
     async resetUnreadCounts(_id: string): Promise<void> {
         await ConversationParticipant.updateOne(
-            { _id },                 
-            { $set: { unreadCount: 0 } }   
+            { _id },
+            { $set: { unreadCount: 0 } }
         );
     }
-
+    async updateLastReadMessageId(conversationId: string, lastReadMessageId: string, userId: string): Promise<void> {
+        await ConversationParticipant.updateOne(
+            { conversationId, userId },
+            { lastReadMessageId }
+        );
+    }
 }

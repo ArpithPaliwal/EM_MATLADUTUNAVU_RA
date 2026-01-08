@@ -26,10 +26,10 @@ const conversationParticipantSchema =
         default: 0,
       },
 
-      // lastReadMessageId: {
-      //   type: Schema.Types.ObjectId,
-      //   ref: "Message",
-      // },
+      lastReadMessageId: {
+        type: Schema.Types.ObjectId,
+        ref: "Message",
+      },
 
       
 

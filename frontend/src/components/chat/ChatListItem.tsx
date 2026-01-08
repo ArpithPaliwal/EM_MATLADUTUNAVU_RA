@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+
 import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
 import { getConversationDisplay } from "../../utils/conversationDisplay";
 import { resetUnread } from "../../Services/socket";
@@ -17,20 +17,22 @@ export default function ChatListItem({
   const { name, avatar } = getConversationDisplay(conversation);
   const lastMessage = conversation.lastMessageText ?? "start the conversation";
   const queryClient = useQueryClient();
-  useEffect(() => {}, [conversation.unreadCount]);
-  const resetUnreadAndUpdateUi = () => {
-    resetUnread(conversation.conversationParticipantId);
 
-    queryClient.setQueryData<ConversationListResponseDto[]>(
-      ["conversations"],
-      (old = []) =>
-        old.map((c) =>
-          c.conversationParticipantId === conversation.conversationParticipantId
-            ? { ...c, unreadCount: 0 }
-            : c
-        )
-    );
-  };
+  const resetUnreadAndUpdateUi = () => {
+  if (conversation.unreadCount === 0) return;
+
+  resetUnread(conversation.conversationParticipantId);
+
+  queryClient.setQueryData<ConversationListResponseDto[]>(
+    ["conversations"],
+    (old = []) =>
+      old.map((c) =>
+        c.conversationParticipantId === conversation.conversationParticipantId
+          ? { ...c, unreadCount: 0 }
+          : c
+      )
+  );
+};
   return (
     <div
       className={`flex items-center gap-3 p-3 cursor-pointer 

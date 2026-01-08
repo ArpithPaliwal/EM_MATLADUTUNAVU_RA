@@ -80,6 +80,11 @@ socket.on(
   }
 );
 
+socket.on("conversation:read", async ({ conversationId, lastReadMessageId }) => {
+  const userId=socket.data.userId
+  await conversationParticipantService.updateLastReadMessageId(conversationId,lastReadMessageId,userId)
+});
 };
+
 
 

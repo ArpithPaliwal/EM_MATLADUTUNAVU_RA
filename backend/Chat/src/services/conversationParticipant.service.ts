@@ -22,5 +22,8 @@ export class ConversationParticipantService implements IConversationParticipantS
     async resetUnreadCounts(conversationParticipantId: string): Promise<void> {
         await this.conversationParticipantRepository.resetUnreadCounts(conversationParticipantId)
     }
+    async updateLastReadMessageId(conversationId: string, lastReadMessageId: string, userId:string): Promise<void> {
+        await this.conversationParticipantRepository.updateLastReadMessageId(conversationId,lastReadMessageId,userId)
+    }
 }
 

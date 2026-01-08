@@ -21,22 +21,24 @@ export const disconnectSocket = () => {
 };
 
 export const joinConversations = (conversationIds: string[]) => {
-  if (socket.connected) {
+  if (!socket.connected) return; {
     socket.emit("conversation:join", conversationIds)
   }
 }
 
 export const activeConversation = (conversationId: string) => {
-  if (socket.connected) {
-    socket.emit("conversation:active", conversationId)
-  }
-}
+  if (!socket.connected) return;
+  socket.emit("conversation:active", conversationId);
+  console.log("activeconnection",conversationId);
+  
+};
 
 export const inActiveConversation = (conversationId: string) => {
-  if (socket.connected) {
-    socket.emit("conversation:inactive", conversationId)
-  }
-}
+  if (!socket.connected) return;
+  socket.emit("conversation:inactive", conversationId);
+  console.log("INNNNactiveconnection",conversationId);
+};
+
 
 
 

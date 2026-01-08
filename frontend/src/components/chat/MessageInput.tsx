@@ -13,49 +13,107 @@ export default function MessageInput({ conversationId, senderId }: Props) {
   const uploadMutation = useUploadMessageFile();
   const queryClient = useQueryClient();
 
+  // async function send() {
+  //   const hasText = !!text.trim();
+  //   const hasFile = !!file;
+
+  //   if (!hasText && !hasFile) return;
+
+  //   let filePath: string | undefined;
+
+  //   // upload file if present
+  //   if (hasFile) {
+  //     const res = await uploadMutation.mutateAsync(file);
+  //     filePath = res?.filePath;
+  //   }
+
+  //   // build payload
+  //   const payload = {
+  //     conversationId,
+  //     senderId,
+  //     text: text.trim(),
+  //     filePath,
+  //   };
+
+  //   // send to server — rely on ACK to get the real saved message
+    
+  //   sendMessage(
+  //     payload,
+  //     (savedMsg: MessageResponseDto) => {
+  //       // update cache immediately (dedupe guard)
+        
+  //     },
+  //     (err) => {
+  //       console.error("Message send failed:", err);
+  //     }
+  //   );
+  // }
   async function send() {
-    const hasText = !!text.trim();
-    const hasFile = !!file;
+  const hasText = !!text.trim();
+  const hasFile = !!file;
 
-    if (!hasText && !hasFile) return;
+  if (!hasText && !hasFile) return;
 
-    let filePath: string | undefined;
+  const tempId = crypto.randomUUID();
 
-    // upload file if present
-    if (hasFile) {
-      const res = await uploadMutation.mutateAsync(file);
-      filePath = res?.filePath;
-    }
+  let filePath: string | undefined;
 
-    // build payload
-    const payload = {
+  // upload file first (this is fine)
+  if (hasFile) {
+    const res = await uploadMutation.mutateAsync(file);
+    filePath = res?.filePath;
+  }
+
+  // 🔹 1. OPTIMISTIC UI UPDATE (IMMEDIATE)
+  const optimisticMessage: MessageResponseDto = {
+    _id: tempId,
+    conversationId,
+    senderId: senderId!,
+    text: text.trim(),
+    
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  queryClient.setQueryData<MessageResponseDto[]>(
+    ["messages", conversationId],
+    (old = []) => [...old, optimisticMessage]
+  );
+
+  setText("");
+  setFile(null);
+
+  
+  sendMessage(
+    {
       conversationId,
       senderId,
       text: text.trim(),
       filePath,
-    };
+      tempId, 
+    },
+    (savedMsg) => {
+     
+      queryClient.setQueryData<MessageResponseDto[]>(
+        ["messages", conversationId],
+        (old = []) =>
+          old.map((msg) =>
+            msg._id === tempId ? savedMsg : msg
+          )
+      );
+    },
+    (err) => {
+      console.error("Message send failed:", err);
 
-    // send to server — rely on ACK to get the real saved message
-    sendMessage(
-      payload,
-      (savedMsg: MessageResponseDto) => {
-        // update cache immediately (dedupe guard)
-        queryClient.setQueryData<MessageResponseDto[]>(
-          ["messages", conversationId],
-          (old = []) => {
-            if (old.some((m) => m._id === savedMsg._id)) return old;
-            return [...old, savedMsg];
-          }
-        );
+      // optional: mark failed or remove temp message
+      queryClient.setQueryData<MessageResponseDto[]>(
+        ["messages", conversationId],
+        (old = []) => old.filter((m) => m._id !== tempId)
+      );
+    }
+  );
+}
 
-        setText("");
-        setFile(null);
-      },
-      (err) => {
-        console.error("Message send failed:", err);
-      }
-    );
-  }
 
   return (
     <div className="flex items-center gap-2 p-2">

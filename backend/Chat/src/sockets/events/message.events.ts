@@ -58,12 +58,16 @@ export const emitMessageEvents = async (
       incrementBy: 1,
     });
     console.log(`🔔 DEBUG: Emitted 'conversation:unreadUpdate' to user:${memberId} for conversation:${conversationId}`);
-  }
-
     await conversationParticipantService.updateConversationParticipants(
       message,
       memberId
     );
+  }
+
+    // await conversationParticipantService.updateConversationParticipants(
+    //   message,
+    //   memberId
+    // );
   }
 }
 
