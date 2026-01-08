@@ -20,21 +20,21 @@ export const disconnectSocket = () => {
   if (socket.connected) socket.disconnect();
 };
 
-export const joinConversations = (conversationIds:string[])=>{
-  if(socket.connected){
-    socket.emit("conversation:join",conversationIds)
+export const joinConversations = (conversationIds: string[]) => {
+  if (socket.connected) {
+    socket.emit("conversation:join", conversationIds)
   }
 }
 
-export const activeConversation = (conversationId:string)=>{
-  if(socket.connected){
-    socket.emit("conversation:active",conversationId)
+export const activeConversation = (conversationId: string) => {
+  if (socket.connected) {
+    socket.emit("conversation:active", conversationId)
   }
 }
 
-export const inActiveConversation = (conversationId:string)=>{
-  if(socket.connected){
-    socket.emit("conversation:inactive",conversationId)
+export const inActiveConversation = (conversationId: string) => {
+  if (socket.connected) {
+    socket.emit("conversation:inactive", conversationId)
   }
 }
 
@@ -44,7 +44,7 @@ export const inActiveConversation = (conversationId:string)=>{
 export const onMessageNew = (cb: (msg: MessageResponseDto) => void) => {
   socket.on("message:new", cb);
 
-  
+
   return () => socket.off("message:new", cb);
 };
 
@@ -57,16 +57,7 @@ export const onMessageDeleted = (cb: (payload: { messageId: string }) => void) =
 
 
 
-// socket.emit("message:send", payload, (res: any) => {
-//   if (!res?.ok) {
-//     console.error("Message failed:", res?.error);
-    
-    
-//     return;
-//   }
 
-//   console.log("Delivered:", res.message);
-// });
 type SendMessageAck =
   | { ok: true; message: MessageResponseDto }
   | { ok: false; error: string };
@@ -87,4 +78,10 @@ export const sendMessage = (
   });
 };
 
+export const resetUnread = (
+  conversationParticipantId:string|undefined
+)=>{
+  socket.emit("conversationParticipant:unreadCount",conversationParticipantId)
+  
+}
 

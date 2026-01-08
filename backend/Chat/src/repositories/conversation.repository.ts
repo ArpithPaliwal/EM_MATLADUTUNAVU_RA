@@ -72,6 +72,11 @@ export class ConversationRepository implements IConversationRepository {
                 }
             },
             {
+                $addFields: {
+                    conversationParticipantId: "$participant._id"
+                }
+            },
+            {
                 $replaceRoot: {
                     newRoot: {
                         $mergeObjects: ["$participant", "$$ROOT"]
@@ -91,11 +96,12 @@ export class ConversationRepository implements IConversationRepository {
     }
     async updateConversationLastMessage(conversationId: string, messageId: string, messageText: string, senderId: string, createdAt: string): Promise<any> {
         const updatedConversation = await Conversation.findByIdAndUpdate(
-            conversationId,{ lastMessageId: messageId,
+            conversationId, {
+                lastMessageId: messageId,
             lastMessageText: messageText,
             lastMessageSenderId: senderId,
             lastMessageCreatedAt: createdAt
-         },
+        },
             { new: true }
         );
         return updatedConversation;

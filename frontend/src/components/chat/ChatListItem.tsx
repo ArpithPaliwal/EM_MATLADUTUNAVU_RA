@@ -1,10 +1,11 @@
 import { useEffect } from "react";
-import type  { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
+import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
 import { getConversationDisplay } from "../../utils/conversationDisplay";
-
+import { resetUnread } from "../../Services/socket";
+import { useQueryClient } from "@tanstack/react-query";
 type Props = {
   conversation: ConversationListResponseDto;
-  onSelect: (conversation : ConversationListResponseDto) => void;
+  onSelect: (conversation: ConversationListResponseDto) => void;
   isActive: boolean;
 };
 
@@ -13,17 +14,31 @@ export default function ChatListItem({
   onSelect,
   isActive,
 }: Props) {
-  const {name , avatar} = getConversationDisplay(conversation)
-  const lastMessage = conversation.lastMessageText?? "start the conversation";
+  const { name, avatar } = getConversationDisplay(conversation);
+  const lastMessage = conversation.lastMessageText ?? "start the conversation";
+  const queryClient = useQueryClient();
+  useEffect(() => {}, [conversation.unreadCount]);
+  const resetUnreadAndUpdateUi = () => {
+    resetUnread(conversation.conversationParticipantId);
 
-  useEffect(()=>{
-
-  },[conversation.unreadCount])
+    queryClient.setQueryData<ConversationListResponseDto[]>(
+      ["conversations"],
+      (old = []) =>
+        old.map((c) =>
+          c.conversationParticipantId === conversation.conversationParticipantId
+            ? { ...c, unreadCount: 0 }
+            : c
+        )
+    );
+  };
   return (
     <div
       className={`flex items-center gap-3 p-3 cursor-pointer 
         ${isActive ? "bg-secondary" : "hover:bg-blue-100"}`}
-      onClick={() => onSelect(conversation)}
+      onClick={() => {
+        onSelect(conversation);
+        resetUnreadAndUpdateUi();
+      }}
     >
       {/* Avatar */}
       <img
@@ -35,9 +50,7 @@ export default function ChatListItem({
       {/* Texts */}
       <div className="flex-1">
         <div className="font-semibold">{name}</div>
-        <div className="text-sm text-gray-500 truncate">
-          {lastMessage}
-        </div>
+        <div className="text-sm text-gray-500 truncate">{lastMessage}</div>
       </div>
 
       {/* Unread badge */}

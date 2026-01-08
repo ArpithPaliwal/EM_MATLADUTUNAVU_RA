@@ -6,11 +6,11 @@ export type ConversationBase = {
   createdBy: string;
 
   unreadCount: number;
-    lastMessageId?: string;
-    lastMessageText?: string;
-    lastMessageSenderId?: string;
-    lastMessageCreatedAt?: string;
-  
+  lastMessageId?: string;
+  lastMessageText?: string;
+  lastMessageSenderId?: string;
+  lastMessageCreatedAt?: string;
+  conversationParticipantId?:string
 
   createdAt: string;
   updatedAt: string;

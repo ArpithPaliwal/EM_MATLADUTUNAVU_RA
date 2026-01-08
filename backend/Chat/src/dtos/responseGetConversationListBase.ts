@@ -9,7 +9,7 @@ export type ConversationBase = {
   conversationId?: string;     // in your output, equals _id
   userId: string;              // from participant merge
   unreadCount: number;
-
+  conversationParticipantId:string
   type: "direct" | "group";
 
   members: string[];
