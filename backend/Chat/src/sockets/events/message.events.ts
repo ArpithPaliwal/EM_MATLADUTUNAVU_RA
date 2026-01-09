@@ -12,7 +12,7 @@ export const emitMessageEvents = async (
   io: Server,
   message: any
 ) => {
-  const { conversationId, senderId } = message;
+  const { conversationId, senderId,text } = message;
   console.log("🔍 DEBUG: Full Message Object:", message);
 
 
@@ -56,6 +56,7 @@ export const emitMessageEvents = async (
     io.to(`user:${memberId}`).emit("conversation:unreadUpdate", {
       conversationId,
       incrementBy: 1,
+      text     
     });
     console.log(`🔔 DEBUG: Emitted 'conversation:unreadUpdate' to user:${memberId} for conversation:${conversationId}`);
     await conversationParticipantService.updateConversationParticipants(

@@ -30,7 +30,7 @@ function Home() {
 
 
 useEffect(() => {
-  const cleanup = onUnreadUpdate(({ conversationId, incrementBy }) => {
+  const cleanup = onUnreadUpdate(({ conversationId, incrementBy ,text}) => {
     // 🔒 RECTIFICATION
     if (selectedChat?._id === conversationId) {
       return;
@@ -45,7 +45,7 @@ useEffect(() => {
           conv._id === conversationId
             ? {
                 ...conv,
-                unreadCount: conv.unreadCount + incrementBy,
+                unreadCount: conv.unreadCount + incrementBy,lastMessageText:text
               }
             : conv
         );

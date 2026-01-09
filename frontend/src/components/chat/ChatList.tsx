@@ -9,11 +9,13 @@ type props = {
   onSelect: (conversation : ConversationListResponseDto) => void;
 };
 export default function ChatList({ selectedChat, onSelect }: props) {
+  
   const { data, isLoading ,error} = useConversations();
     useEffect(() => {
     if (!data) return;
-
-    const ids = data?.map(c => c._id);   
+      
+    const ids = data?.map(c => c._id); 
+     
     joinConversations(ids);          
   }, [data]);        
   if (isLoading) return <div>Loading…</div>;
