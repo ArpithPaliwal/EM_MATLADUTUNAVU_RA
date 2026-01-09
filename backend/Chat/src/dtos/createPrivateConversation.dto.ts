@@ -1,7 +1,8 @@
 export interface PrivateConversationDTO {
     userId: string;
-    memberId: string;
+    memberUsername?: string |undefined;
     createdBy?: string;
+    memberId?:string | undefined
 }
 export interface createGroupConversationDTO {
     avatarLocalPath?: string | undefined;

@@ -1,4 +1,5 @@
 import type { SignupInitiateDTO } from "../../dtos/signup.dto.js";
+import type { UserDetailsSummaryDTO } from "../../dtos/userDetailsSummary.dto.js";
 
 
 export interface IAuthRepository {
@@ -10,5 +11,6 @@ export interface IAuthRepository {
     updateAvatar(userId: string, avatarLocalPath: string): Promise<any>;
     updatePassword(userId: string, hashedPassword: string): Promise<any>;
     getUserInBulk(userIds: string[]): Promise<any[]>;
-    userExists(userId: string): Promise<boolean>;
+    getUserInfoByUsername(username: string): Promise<any>;
+    
 }

@@ -1,7 +1,10 @@
+import mongoose from "mongoose";
 import type { SignupInitiateDTO } from "../dtos/signup.dto.js";
 import { User } from "../models/user.model.js";
 
 import type { IAuthRepository } from "./interfaces/auth.repository.interface.js";
+import type { UserDetailsSummaryDTO } from "../dtos/userDetailsSummary.dto.js";
+import { ApiError } from "../utils/apiError.js";
 
 export class AuthRepository implements IAuthRepository {
     async createUser(data: SignupInitiateDTO, avatar: string, refreshToken: string): Promise<any> {
@@ -41,10 +44,20 @@ export class AuthRepository implements IAuthRepository {
         );
     }
     async getUserInBulk(userIds: string[]): Promise<any[]> {
-        return  await User.find({ _id: { $in: userIds } },{username:1,avatar:1}).lean();
+        return await User.find({ _id: { $in: userIds } }, { username: 1, avatar: 1 }).lean();
     }
-    async userExists(userId: string): Promise<boolean> {
-        const user = await User.findById(userId).select('_id');
-        return user !== null;
+    async getUserInfoByUsername(username: string): Promise<any> {
+         const details= await User.findOne(
+            { username },
+            { _id: 1, username: 1, avatar: 1 }
+        ).lean();
+        console.log(details);
+        
+        return details
     }
+
+
+
+
+
 }

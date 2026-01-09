@@ -9,10 +9,10 @@ export class ConversationController implements IConversationController {
   constructor(private conversationService: IConversationService = new ConversationService()) {}
 
   createPrivateConversation = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const { memberId } = req.body;
+    const { memberUsername } = req.body;
     const userId = req.user?._id
     console.log("USER ID FROM REQ.USER:", userId);
-    const conversation = await this.conversationService.createPrivateConversation({ memberId, userId ,createdBy:userId});
+    const conversation = await this.conversationService.createPrivateConversation({ memberUsername, userId ,createdBy:userId});
     return res.status(201).json(new ApiResponse(201, conversation, "Private conversation created successfully"));
   })
   

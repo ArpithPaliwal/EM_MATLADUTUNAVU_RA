@@ -13,7 +13,7 @@ import type { ConversationWithDetails } from "../dtos/responseGetConversatiuonLi
 import type { ConversationBase } from "../dtos/responseGetConversationListBase.js";
 import type { UserBulkResponse } from "../dtos/userDetailsSummary.dto.js";
 function getTheOtherMemberId(members: string[], userId: string) {
-  return members.find(m => m.toString() !== userId.toString())!;
+    return members.find(m => m.toString() !== userId.toString())!;
 }
 
 
@@ -25,22 +25,51 @@ export class ConversationService implements IConversationService {
     ) { }
 
     async createPrivateConversation(data: PrivateConversationDTO): Promise<any> {
-        const { userId, memberId } = data;
-        const memberExists = await this.userClient.checkUserExists(data.memberId);
-        if (!memberExists) {
-            throw new Error("user does not exist");
+        const { userId, memberUsername, createdBy } = data;
+        
+
+        if (!memberUsername) {
+            throw new ApiError(400, "Username is required");
         }
-        const conversationExists = await this.conversationrepository.checkExistingPrivateConversation(data);
+
+        let member;
+
+        try {
+            member = await this.userClient.getUserInfoByUsername(memberUsername);
+        } catch (error) {
+            // user service returned 404 or failed
+            throw new ApiError(404, "User does not exist");
+        }
+
+        if (!member) {
+            throw new ApiError(404, "User does not exist");
+        }
+
+        const memberId = member.id || member._id;
+        const updatedData = {
+            ...data,
+            memberId
+        };
+
+        console.log("up", updatedData);
+
+        const conversationExists =
+            await this.conversationrepository.checkExistingPrivateConversation({
+                userId,
+                memberId,
+            });
+
         if (conversationExists) {
-            throw new Error("conversation already exists");
+            throw new ApiError(409, "Conversation already exists");
         }
 
         const session = await mongoose.startSession();
         try {
-            session.startTransaction();
-            const conversation = await this.conversationrepository.createPrivateConversation(data, session);
 
-            await this.conversationParticipantService.createConversationParticipants({ userIds: [userId, memberId], conversationId: conversation._id }, session);
+            session.startTransaction();
+            const conversation = await this.conversationrepository.createPrivateConversation(updatedData, session);
+
+            await this.conversationParticipantService.createConversationParticipants({ userIds: [userId, member?._id], conversationId: conversation._id }, session);
 
             await session.commitTransaction();
 
@@ -58,6 +87,8 @@ export class ConversationService implements IConversationService {
 
 
     }
+
+
     async createGroupConversation(data: createGroupConversationDTO): Promise<any> {
         const { groupName, memberIds, createdBy, avatarLocalPath } = data;
         if (Array.isArray(memberIds) && memberIds.length < 2) {
@@ -122,13 +153,13 @@ export class ConversationService implements IConversationService {
 
             const partnerId = getTheOtherMemberId(c.members, userId).toString();
 
-            return partnerId?{
+            return partnerId ? {
                 ...c,
                 partner: partnerMap.get(partnerId),
-            }:c;
+            } : c;
         });
-        console.log("stichd",ConversationsStiched);
-        
+        console.log("stichd", ConversationsStiched);
+
         return ConversationsStiched;
     }
     async updateConversationLastMessage(conversationId: string, messageId: string, messageText: string, senderId: string, createdAt: string): Promise<any> {

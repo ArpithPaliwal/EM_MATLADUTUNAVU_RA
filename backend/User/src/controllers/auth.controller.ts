@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import type { IAuthController } from "./interfaces/auth.controller.interface.js";
 import type { IAuthService } from "../services/interfaces/auth.service.interface.js";
 import { AuthService } from "../services/auth.service.js";
@@ -7,6 +7,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import type { SignupInitiateDTO } from "../dtos/signup.dto.js";
 import { ApiError } from "../utils/apiError.js";
+import type { ParamsDictionary } from "express-serve-static-core";
+import type { ParsedQs } from "qs";
 
 
 export class AuthController implements IAuthController {
@@ -155,7 +157,8 @@ export class AuthController implements IAuthController {
   )
   getUserInBulk = asyncHandler(
     async (req: Request, res: Response): Promise<Response> => {
-      const userIds: string[] = req.body.userIds; 
+      const userIds: string[]= req.body.userIds; 
+      
       if (!Array.isArray(userIds) || userIds.length === 0) {
         throw new ApiError(400, "User IDs array is required");
       }
@@ -165,16 +168,20 @@ export class AuthController implements IAuthController {
       )
     } 
   )
-  userExists = asyncHandler(
+  getUserInfoByUsername = asyncHandler(
     async (req: Request, res: Response): Promise<Response> => {
-      const { userId } = req.params;
-      if (!userId || userId.trim() === "" || userId === undefined) {
-        throw new ApiError(400, "User ID is required");
+      const {username}= req.body; 
+      console.log(username);
+      
+      if(!username){
+        throw new ApiError(400,"username cannot be undefined")
       }
-      const exists = await this.authService.userExists(userId);
+      const user = await this.authService.getUserInfoByUsername(username);  
+      console.log(user);
+      
       return res.status(200).json(
-        new ApiResponse(200, exists , "User existence checked successfully")
+        new ApiResponse(200,  user , "Users fetched successfully")
       )
-    }
+    } 
   )
 }

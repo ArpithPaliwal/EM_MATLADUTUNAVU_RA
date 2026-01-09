@@ -189,12 +189,12 @@ export class AuthService implements IAuthService {
         if (!user) {
             throw new ApiError(404, "User not found");
         }
-        const userWithUpdateUsername=await this.authrepository.updateUsername(userId, newUsername);
-        if(!userWithUpdateUsername){
+        const userWithUpdateUsername = await this.authrepository.updateUsername(userId, newUsername);
+        if (!userWithUpdateUsername) {
             throw new ApiError(500, "Failed to update username");
-        }   
+        }
         return userWithUpdateUsername.username;
-    }   
+    }
     async updateAvatar(userId: string, avatarLocalPath: string): Promise<string> {
         const user = await this.authrepository.findUserById(userId);
         if (!user) {
@@ -236,7 +236,7 @@ export class AuthService implements IAuthService {
         if (!comparePassword(currentPassword, user.password)) {
             throw new ApiError(400, "Current password is incorrect");
         }
-        const  hashedpassword=await hashPassword(newPassword);
+        const hashedpassword = await hashPassword(newPassword);
 
         const updatedPassword = await this.authrepository.updatePassword(userId, hashedpassword);
         return updatedPassword;
@@ -245,9 +245,19 @@ export class AuthService implements IAuthService {
         const users = await this.authrepository.getUserInBulk(userIds);
         return users;
     }
-    async userExists(userId: string): Promise<boolean> {
-        const exists = await this.authrepository.userExists(userId);
-        console.log(`User existence check for ID ${userId}: ${exists}`);
-        return exists;
+    async getUserInfoByUsername(username: string): Promise<UserDetailsSummaryDTO> {
+        const user = await this.authrepository.getUserInfoByUsername(username);
+
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+        console.log(user);
+        
+        return {
+            id: user._id.toString(),
+            username: user.username,
+            avatar: user.avatar,
+        };
     }
+
 }
