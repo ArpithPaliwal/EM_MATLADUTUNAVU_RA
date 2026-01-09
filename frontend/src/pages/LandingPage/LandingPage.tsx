@@ -17,7 +17,7 @@ function LandingPage() {
             />
           </div>
           <div className="h-[90%] w-[90%] md:h-[30vh] md:w-[30vw] ">
-            <img src={isDark ?icon:icon1} alt="" className="object-fill" />
+            <img src={isDark ? icon1:icon} alt="" className="object-fill" />
           </div>
         </div>
 
