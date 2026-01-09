@@ -3,6 +3,8 @@ import {  z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import nameDarkTheme from "../../assets/name_dark-theme.svg"
+import nameLightTheme from "../../assets/name_light-theme.svg"
 import Toast from "../../utils/Toast";
 
 import { initiateRegisterUser } from "../../API/userApi";
@@ -74,30 +76,27 @@ function SignupPage() {
     const formData = createFormData(data);
     mutation.mutateAsync(formData);
   };
-
+  const isDark = document.documentElement.dataset.theme === "dark";
   return (
-    <div className="relative flex justify-center items-center bg-background overflow-hidden p-4 min-h-screen">
+    <div className="relative flex justify-center items-center bg-primary overflow-hidden p-4 min-h-screen">
       <div className="w-full max-w-md bg-accent border border-[#0096c7]/30 p-7 rounded-2xl shadow-lg flex justify-center items-center flex-col">
         <div className="md:h-[20vh] md:w-[20vw]">
+          
           <img
-            src="name_light-theme.svg"
-            className="block  h-full w-full object-contain"
-          />
-          <img
-            src="name_dark-theme.svg"
-            className="hidden  h-full w-full object-contain"
+            src={isDark ? nameDarkTheme : nameLightTheme}
+            className=" h-full w-full object-contain"
           />
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
           {/* Username */}
           <div>
-            <label className="block text-sm font-semibold text-text mb-1">
+            <label className="block text-sm font-semibold text-primary mb-1">
               Username
             </label>
             <input
               type="text"
               placeholder="Enter your username"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
               {...register("username")}
             />
             <p className="text-red-500 text-sm mt-1">
@@ -107,13 +106,13 @@ function SignupPage() {
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-semibold text-text mb-1">
+            <label className="block text-sm font-semibold text-primary mb-1">
               Email
             </label>
             <input
               type="email"
               placeholder="Enter your email"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
               {...register("email")}
             />
             <p className="text-red-500 text-sm mt-1">{errors.email?.message}</p>
@@ -121,13 +120,13 @@ function SignupPage() {
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-semibold text-text mb-1">
+            <label className="block text-sm font-semibold text-primary mb-1">
               Password
             </label>
             <input
               type="password"
               placeholder="Enter your password"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
               {...register("password")}
             />
             <p className="text-red-500 text-sm mt-1">
@@ -137,13 +136,13 @@ function SignupPage() {
 
           {/* Avatar */}
           <div>
-            <label className="block text-sm font-semibold text-text mb-1">
+            <label className="block text-sm font-semibold text-primary mb-1">
               Avatar Image
             </label>
             <input
               type="file"
               accept=".jpeg,.png,.webp"
-              className="w-full text-sm border border-gray-300 rounded-lg p-1 text-text focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
+              className="w-full text-sm border  rounded-lg p-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
               {...register("avatar")}
             />
             <p className="text-red-500 text-sm mt-1">

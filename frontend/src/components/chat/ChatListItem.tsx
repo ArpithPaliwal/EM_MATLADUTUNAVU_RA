@@ -35,8 +35,8 @@ export default function ChatListItem({
 };
   return (
     <div
-      className={`flex items-center gap-3 p-3 cursor-pointer 
-        ${isActive ? "bg-secondary" : "hover:bg-blue-100"}`}
+      className={`flex items-center gap-3 p-3 cursor-pointer rounded-2xl
+        ${isActive ? "bg-secondary" : "hover:bg-blue-400"}`}
       onClick={() => {
         onSelect(conversation);
         resetUnreadAndUpdateUi();
@@ -51,13 +51,13 @@ export default function ChatListItem({
 
       {/* Texts */}
       <div className="flex-1">
-        <div className="font-semibold">{name}</div>
-        <div className="text-sm text-gray-500 truncate">{lastMessage}</div>
+        <div className="font-semibold text-primary">{name}</div>
+        <div className="text-sm text-secondary truncate">{lastMessage}</div>
       </div>
 
       {/* Unread badge */}
       {conversation.unreadCount > 0 && (
-        <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+        <span className="bg-secondary text-white text-xs px-2 py-1 rounded-full">
           {conversation.unreadCount}
         </span>
       )}

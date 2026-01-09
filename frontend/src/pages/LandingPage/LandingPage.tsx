@@ -1,27 +1,23 @@
 import { Link } from "react-router-dom";
-
+import nameDarkTheme from "../../assets/name_dark-theme.svg"
+import nameLightTheme from "../../assets/name_light-theme.svg"
+import icon from "../../assets/icon.svg"
+import icon1 from "../../assets/icon-1.svg"
 function LandingPage() {
+    const isDark = document.documentElement.dataset.theme === "dark";
   return (
-    <div className="w-full  overflow-hidden">
-      <div className="">
+    <div className="w-full  overflow-hidden ">
+      <div className="bg-primary">
         <div className="h-full flex justify-center flex-col items-center w-screen gap-10 md:gap-0 ">
           <div className="h-[90%] w-[90%] md:h-[30vh] md:w-[30vw]">
-            {/* <img
-              src="name_light-theme.svg"
-              alt=""
-              className="h-full w-full object-contain"
-            /> */}
+            
             <img
-              src="name_light-theme.svg"
-              className="block  h-full w-full object-contain"
-            />
-            <img
-              src="name_dark-theme.svg"
-              className="hidden  h-full w-full object-contain"
+              src={isDark ? nameDarkTheme : nameLightTheme}
+              className="  h-full w-full object-contain"
             />
           </div>
           <div className="h-[90%] w-[90%] md:h-[30vh] md:w-[30vw] ">
-            <img src="icon.svg" alt="" className="object-fill" />
+            <img src={isDark ?icon:icon1} alt="" className="object-fill" />
           </div>
         </div>
 

@@ -22,17 +22,17 @@ html {
 :root {
   --primary-background: #ffffff;
   --secondary-background: #0096c7;
-
+  --third-background:#d1d5dc;
   --primary-text: #0f172a;
-  --secondary-text: #6b7280;
+  --secondary-text: #696b6e;
 }
 
 [data-theme="dark"] {
-  --primary-background: #0b0b0b;
-  --secondary-background: #1452d8;
-
+  --primary-background: #002147;
+  --secondary-background: #0096c7;
+  --third-background:#a9cdf6;
   --primary-text: #f3f4f6;
-  --secondary-text: #9ca3af;
+  --secondary-text: #cdd2da;
 }
 
 
@@ -44,6 +44,9 @@ html {
 
 .bg-secondary {
   background: var(--secondary-background);
+}
+.bg-third {
+  background: var(--third-background);
 }
 
 .text-primary {

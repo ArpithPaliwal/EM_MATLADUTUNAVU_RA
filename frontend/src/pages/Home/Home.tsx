@@ -6,7 +6,8 @@ import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto
 import ConversationArea from "../../components/chat/conversationArea";
 import { useQueryClient } from "@tanstack/react-query";
 import { onUnreadUpdate } from "../../Services/socket";
-
+import nameDarkTheme from "../../assets/name_dark-theme.svg";
+import nameLightTheme from "../../assets/name_light-theme.svg";
 type UserData = {
   avatar: string;
   _id: string;
@@ -28,46 +29,42 @@ function Home() {
   const { userData } = useSelector((state: AppState) => state.auth);
   const queryClient = useQueryClient();
 
-
-useEffect(() => {
-  const cleanup = onUnreadUpdate(({ conversationId, incrementBy ,text}) => {
-    // 🔒 RECTIFICATION
-    if (selectedChat?._id === conversationId) {
-      return;
-    }
-
-    queryClient.setQueryData(
-      ["conversations"],
-      (oldData: ConversationListResponseDto[] | undefined) => {
-        if (!oldData) return oldData;
-
-        return oldData.map((conv) =>
-          conv._id === conversationId
-            ? {
-                ...conv,
-                unreadCount: conv.unreadCount + incrementBy,lastMessageText:text
-              }
-            : conv
-        );
+  useEffect(() => {
+    const cleanup = onUnreadUpdate(({ conversationId, incrementBy, text }) => {
+      // 🔒 RECTIFICATION
+      if (selectedChat?._id === conversationId) {
+        return;
       }
-    );
-  });
 
-  return cleanup;
-}, [queryClient, selectedChat?._id]);
+      queryClient.setQueryData(
+        ["conversations"],
+        (oldData: ConversationListResponseDto[] | undefined) => {
+          if (!oldData) return oldData;
+
+          return oldData.map((conv) =>
+            conv._id === conversationId
+              ? {
+                  ...conv,
+                  unreadCount: conv.unreadCount + incrementBy,
+                  lastMessageText: text,
+                }
+              : conv
+          );
+        }
+      );
+    });
+
+    return cleanup;
+  }, [queryClient, selectedChat?._id]);
+  const isDark = document.documentElement.dataset.theme === "dark";
 
   return (
-    <div className="px-3 h-screen overflow-hidden">
-      {/* Header */}
+    <div className="px-3 h-screen overflow-hidden bg-primary w-full">
       <div className="flex items-center justify-between px-4 py-3">
         <div className="h-10 w-32 md:h-12 md:w-40">
           <img
-            src="name_light-theme.svg"
-            className="block h-full w-full object-contain"
-          />
-          <img
-            src="name_dark-theme.svg"
-            className="hidden h-full w-full object-contain"
+            src={isDark ? nameDarkTheme : nameLightTheme}
+            className="h-full w-full object-contain"
           />
         </div>
 
@@ -80,10 +77,12 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Main chat layout */}
-      <div className="border-3 border-blue-300 rounded-2xl p-2 flex gap-2 h-[85vh] min-h-0">
-        {/* Chat list */}
-        <div className="flex flex-col w-80 min-w-64 border-r">
+      <div className="border-3 border-blue-300 rounded-2xl p-2 flex gap-2 h-[85vh] w-full">
+        <div
+          className={`flex flex-col w-80 min-w-64  ${
+            selectedChat ? "hidden" : "block"
+          } sm:block`}
+        >
           <ConversationListHeader />
 
           <div className="h-full  border-gray-300 dark:border-gray-600 overflow-y-auto pr-2">
@@ -91,8 +90,9 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Conversation area */}
-        <div className="flex-1 min-h-0">
+        <div className={`flex-1 min-h-0 ${
+            selectedChat ? "block" : "hidden"
+          } sm:block`}>
           <ConversationArea
             conversation={selectedChat}
             userId={userData?._id}

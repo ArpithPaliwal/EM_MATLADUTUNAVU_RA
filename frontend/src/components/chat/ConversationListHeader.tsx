@@ -30,8 +30,8 @@ export default function ConversationListHeader() {
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="border-2 border-blue-200 rounded-xl px-2"
-        placeholder="Enter Member ID"
+        className="border-2 border-blue-200 rounded-xl px-2 text-primary "
+        placeholder="Enter username"
       />
       <div>
         <button

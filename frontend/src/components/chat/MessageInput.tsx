@@ -116,16 +116,17 @@ export default function MessageInput({ conversationId, senderId }: Props) {
 
 
   return (
-    <div className="flex items-center gap-2 p-2">
+    <div className="flex items-center gap-2 p-2 bg-third rounded-xl w-[88vw] sm:w-full">
       <input
         type="file"
         accept="image/*,video/*"
         name="userUploadedMediaFile"
         onChange={(e) => setFile(e.target.files?.[0] || null)}
+        className="w-9"
       />
 
       <input
-        className="flex-1 border rounded-xl px-3 py-2"
+        className="w-full border rounded-xl px-3 py-2"
         placeholder="Type a message…"
         value={text}
         onChange={(e) => setText(e.target.value)}

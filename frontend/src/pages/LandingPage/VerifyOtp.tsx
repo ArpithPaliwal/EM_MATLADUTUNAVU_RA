@@ -47,14 +47,14 @@ function VerifyOtp() {
       mutation.mutate({ email, otpValue });
     }
   }
-
+  const isDark = document.documentElement.dataset.theme === "dark";
   return (
     <div className="relative flex justify-center items-center bg-background overflow-hidden p-4 min-h-screen">
       <div className="w-full max-w-md bg-accent border border-[#0096c7]/30 p-7 rounded-2xl shadow-lg flex justify-center items-center flex-col">
 
         <div className="md:h-[20vh] md:w-[20vw]">
-          <img src="name_light-theme.svg" className="block h-full w-full object-contain" />
-          <img src="name_dark-theme.svg" className="hidden h-full w-full object-contain" />
+          
+          <img  src={isDark ? "name_dark-theme.svg" : "name_light-theme.svg"} className="hidden h-full w-full object-contain" />
         </div>
 
         <OtpInput length={6} onComplete={handleOtpComplete} />

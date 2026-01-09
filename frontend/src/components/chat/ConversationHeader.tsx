@@ -12,17 +12,17 @@ export default function ConversationHeader({ conversation }: Props) {
     
 
   return (
-    <div className="flex items-center gap-3 h-16 px-4 rounded-xl bg-gray-300">
+    <div className="flex items-center gap-3 h-16 px-4 rounded-xl bg-third w-[88vw] sm:w-full">
       <img
         src={avatar}
         alt={name}
         className="w-10 h-10 rounded-full object-cover"
       />
 
-      <div className="flex flex-col">
+      
         <span className="font-semibold text-gray-900">{name}</span>
       
-      </div>
+      
 
       
       
