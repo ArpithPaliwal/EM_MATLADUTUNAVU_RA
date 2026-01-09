@@ -26,7 +26,7 @@ export class ConversationService implements IConversationService {
 
     async createPrivateConversation(data: PrivateConversationDTO): Promise<any> {
         const { userId, memberUsername, createdBy } = data;
-        
+        console.log("data", data);
 
         if (!memberUsername) {
             throw new ApiError(400, "Username is required");
@@ -103,9 +103,15 @@ export class ConversationService implements IConversationService {
         if (!avatarCloudinaryData) {
             throw new ApiError(500, "Failed to upload avatar on Cloudinary");
         }
+        
 
-        const avatar = avatarCloudinaryData?.secure_url
-        data.avatarLocalPath = avatar;
+const groupAvatar = {
+  url: avatarCloudinaryData.secure_url,
+  publicId: avatarCloudinaryData.public_id,
+};
+
+        data = {...data , groupAvatar}
+        
         const session = await mongoose.startSession();
         try {
 

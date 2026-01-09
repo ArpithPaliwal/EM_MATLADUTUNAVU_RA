@@ -1,3 +1,3 @@
-import { UserPlus, CirclePlus  } from 'lucide-react';
+import { UserPlus, CirclePlus ,X } from 'lucide-react';
 
-export {UserPlus,CirclePlus }
+export {UserPlus,CirclePlus,X }

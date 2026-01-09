@@ -83,10 +83,10 @@ useEffect(() => {
       {/* Main chat layout */}
       <div className="border-3 border-blue-300 rounded-2xl p-2 flex gap-2 h-[85vh] min-h-0">
         {/* Chat list */}
-        <div className="flex flex-col w-80 min-w-64">
+        <div className="flex flex-col w-80 min-w-64 border-r">
           <ConversationListHeader />
 
-          <div className="h-full border-r border-gray-300 dark:border-gray-600 overflow-y-auto pr-2">
+          <div className="h-full  border-gray-300 dark:border-gray-600 overflow-y-auto pr-2">
             <ChatList selectedChat={selectedChat} onSelect={setSelectedChat} />
           </div>
         </div>

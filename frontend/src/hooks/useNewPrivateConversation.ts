@@ -21,15 +21,14 @@ export function useCreatePrivateConversation() {
   >({
     mutationFn: createNewPrivateConversation,
 
-    onSuccess: (data, variables) => {
+    onSuccess: (data) => {
       console.log("Private conversation created successfully");
-      console.log("Payload:", variables);
+      
       console.log("Response:", data);
     },
 
-    onError: (error, variables) => {
+    onError: (error) => {
       console.error("Failed to create private conversation");
-      console.error("Payload:", variables);
       console.error("Error message:", error.message);
     },
   });

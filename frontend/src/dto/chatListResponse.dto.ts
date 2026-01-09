@@ -19,7 +19,7 @@ export type DirectConversation = ConversationBase & {
   type: "direct";
 
   partner: {
-    id: string;
+    _id: string;
     username: string;
     avatar?: string;
   };

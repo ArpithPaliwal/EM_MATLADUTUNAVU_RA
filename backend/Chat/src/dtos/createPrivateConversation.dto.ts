@@ -5,9 +5,13 @@ export interface PrivateConversationDTO {
     memberId?:string | undefined
 }
 export interface createGroupConversationDTO {
-    avatarLocalPath?: string | undefined;
+    groupAvatar?:groupAvatarDetails 
     groupName: string;
     memberIds: string[];
     createdBy: string;
-
+    avatarLocalPath:string
 }   
+export type groupAvatarDetails = {
+    url:string,
+    publicId:string
+}
