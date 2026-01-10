@@ -9,7 +9,7 @@ import {
   socket,
 } from "../../Services/socket";
 import { useQueryClient } from "@tanstack/react-query";
-import type { MessageResponseDto } from "../../dto/messages.dto";
+import type { MessagePage, MessageResponseDto } from "../../dto/messages.dto";
 
 type Props = {
   conversationId: string;
@@ -28,20 +28,39 @@ type AppState = {
   auth: AuthState;
 };
 
-// ✅ helper — ONLY Mongo ObjectIds are allowed for read cursor
+//helper — ONLY Mongo ObjectIds are allowed for read cursor
 const isMongoObjectId = (id: string) => /^[a-f\d]{24}$/i.test(id);
 
 export default function MessageList({ conversationId }: Props) {
-  const { data, isLoading, isError } = useMessages(conversationId);
+  const topRef = useRef<HTMLDivElement | null>(null);
+
+  const { data, isLoading, isError, fetchNextPage, hasNextPage } =
+    useMessages(conversationId);
   const { userData } = useSelector((state: AppState) => state.auth);
   const queryClient = useQueryClient();
 
-  // 🔑 read cursor (persisted messages only)
+  //  read cursor (persisted messages only)
   const latestReadIdRef = useRef<string | null>(null);
+useEffect(() => {
+  if (!topRef.current || !hasNextPage) return;
 
-  /* --------------------------------------------------
-     1️⃣ JOIN / LEAVE + SOCKET LISTENERS
-  -------------------------------------------------- */
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        fetchNextPage();
+      }
+    },
+    {
+      root: null,
+      threshold: 0.1,
+    }
+  );
+
+  observer.observe(topRef.current);
+
+  return () => observer.disconnect();
+}, [fetchNextPage, hasNextPage]);
+
   useEffect(() => {
     if (!conversationId) return;
 
@@ -58,7 +77,7 @@ export default function MessageList({ conversationId }: Props) {
         }
       );
 
-      // 🔒 advance cursor ONLY for persisted messages
+      //  advance cursor ONLY for persisted messages
       if (isMongoObjectId(msg._id)) {
         latestReadIdRef.current = msg._id;
       }
@@ -83,12 +102,14 @@ export default function MessageList({ conversationId }: Props) {
      Mark last persisted message as read once
   -------------------------------------------------- */
   useEffect(() => {
-    if (!data || data.length === 0) return;
+    if (!data || data?.pages?.length === 0) return;
 
     // find last Mongo-persisted message
-    const lastPersisted = [...data]
-      .reverse()
-      .find((m) => isMongoObjectId(m._id));
+
+    const lastPersisted = data?.pages
+      ?.flatMap((p:MessagePage) => p.messages)
+      ?.reverse()
+      ?.find((m) => isMongoObjectId(m._id));
 
     if (!lastPersisted) return;
 
@@ -129,13 +150,11 @@ export default function MessageList({ conversationId }: Props) {
 
   if (isError) {
     return (
-      <div className="p-4 text-sm text-red-500">
-        Failed to load messages.
-      </div>
+      <div className="p-4 text-sm text-red-500">Failed to load messages.</div>
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!data || data?.pages?.length === 0) {
     return (
       <div className="p-4 text-sm text-gray-500">
         No messages yet. Start the conversation.
@@ -143,47 +162,53 @@ export default function MessageList({ conversationId }: Props) {
     );
   }
 
+  const allMessages =
+  data?.pages.flatMap((p) => p.messages) || [];
+
   return (
     <div className="flex flex-col gap-2 p-3 overflow-y-auto">
-      {data.map((msg) => {
-        const isMine = msg.senderId === userData?._id;
+      <div ref={topRef} className="h-2" />
 
-        return (
-          <div
-            key={msg._id}
-            className={`max-w-xs px-3 py-2 rounded-xl text-sm ${
-              isMine
-                ? "self-end bg-secondary text-white"
-                : "self-start bg-gray-200 text-gray-900"
-            }`}
-          >
-            {msg.text && <p>{msg.text}</p>}
+      {allMessages.map((msg) => {
+  const isMine = msg.senderId === userData?._id;
 
-            {msg.imageUrl && (
-              <img
-                src={msg.imageUrl}
-                alt="attachment"
-                className="mt-1 rounded-md max-h-60 object-cover"
-              />
-            )}
+  return (
+    <div
+      key={msg._id}
+      className={`max-w-xs px-3 py-2 rounded-xl text-sm ${
+        isMine
+          ? "self-end bg-secondary text-white"
+          : "self-start bg-gray-200 text-gray-900"
+      }`}
+    >
+      {msg.text && <p>{msg.text}</p>}
 
-            {msg.videoUrl && (
-              <video
-                src={msg.videoUrl}
-                controls
-                className="mt-1 rounded-md max-h-60"
-              />
-            )}
+      {msg.imageUrl && (
+        <img
+          src={msg.imageUrl}
+          alt="attachment"
+          className="mt-1 rounded-md max-h-60 object-cover"
+        />
+      )}
 
-            <div className="mt-1 text-xs opacity-70">
-              {new Date(msg.createdAt).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </div>
-          </div>
-        );
-      })}
+      {msg.videoUrl && (
+        <video
+          src={msg.videoUrl}
+          controls
+          className="mt-1 rounded-md max-h-60"
+        />
+      )}
+
+      <div className="mt-1 text-xs opacity-70 text-right">
+        {new Date(msg.createdAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </div>
+    </div>
+  );
+})}
+
     </div>
   );
 }

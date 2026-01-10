@@ -1,16 +1,16 @@
 import api from "../utils/axiosinstanceChat.js";
 import { AxiosError } from "axios";
 import type {ApiError} from "../dto/apiError"
-import type { MessageResponseDto } from "../dto/messages.dto.js";
+import type { MessagePage } from "../dto/messages.dto.js";
 import { createFormData } from "../utils/createFormData.js";
 
 
 
-export const  getMessages= async (conversationId:string):Promise<MessageResponseDto[]> =>{
+export const  getMessages= async (conversationId:string,cursor:string | null ):Promise<MessagePage> =>{
     try {
       console.log("sent succe");
       
-         const res = await api.get(`/chat/messages/getMessages/${conversationId}`, { withCredentials: true});
+         const res = await api.get(`/chat/messages/getMessages/${conversationId}?cursor=${cursor || ""}`, { withCredentials: true});
       console.log("check");
     
     console.log(res);
