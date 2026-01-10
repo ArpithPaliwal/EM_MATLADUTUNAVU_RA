@@ -9,5 +9,6 @@ export function useMessages(conversationId: string) {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
         staleTime: 60_000,          
         refetchOnWindowFocus: false,
+        
     })
 }
