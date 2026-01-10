@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { sendMessage } from "../../Services/socket";
 import { useUploadMessageFile } from "../../hooks/useUploadMessageFile";
-import { useQueryClient } from "@tanstack/react-query";
-import type { MessageResponseDto } from "../../dto/messages.dto";
+import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
+import type { MessagePage, MessageResponseDto } from "../../dto/messages.dto";
 
 type Props = { conversationId: string; senderId: string | undefined };
 
@@ -36,12 +36,12 @@ export default function MessageInput({ conversationId, senderId }: Props) {
   //   };
 
   //   // send to server — rely on ACK to get the real saved message
-    
+
   //   sendMessage(
   //     payload,
   //     (savedMsg: MessageResponseDto) => {
   //       // update cache immediately (dedupe guard)
-        
+
   //     },
   //     (err) => {
   //       console.error("Message send failed:", err);
@@ -49,71 +49,111 @@ export default function MessageInput({ conversationId, senderId }: Props) {
   //   );
   // }
   async function send() {
-  const hasText = !!text.trim();
-  const hasFile = !!file;
+    const hasText = !!text.trim();
+    const hasFile = !!file;
 
-  if (!hasText && !hasFile) return;
+    if (!hasText && !hasFile) return;
 
-  const tempId = crypto.randomUUID();
+    const tempId = crypto.randomUUID();
 
-  let filePath: string | undefined;
+    let filePath: string | undefined;
 
-  // upload file first (this is fine)
-  if (hasFile) {
-    const res = await uploadMutation.mutateAsync(file);
-    filePath = res?.filePath;
-  }
-
-  // 🔹 1. OPTIMISTIC UI UPDATE (IMMEDIATE)
-  const optimisticMessage: MessageResponseDto = {
-    _id: tempId,
-    conversationId,
-    senderId: senderId!,
-    text: text.trim(),
-    
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  queryClient.setQueryData<MessageResponseDto[]>(
-    ["messages", conversationId],
-    (old = []) => [...old, optimisticMessage]
-  );
-
-  setText("");
-  setFile(null);
-
-  
-  sendMessage(
-    {
-      conversationId,
-      senderId,
-      text: text.trim(),
-      filePath,
-      tempId, 
-    },
-    (savedMsg) => {
-     
-      queryClient.setQueryData<MessageResponseDto[]>(
-        ["messages", conversationId],
-        (old = []) =>
-          old.map((msg) =>
-            msg._id === tempId ? savedMsg : msg
-          )
-      );
-    },
-    (err) => {
-      console.error("Message send failed:", err);
-
-      // optional: mark failed or remove temp message
-      queryClient.setQueryData<MessageResponseDto[]>(
-        ["messages", conversationId],
-        (old = []) => old.filter((m) => m._id !== tempId)
-      );
+    // upload file first (this is fine)
+    if (hasFile) {
+      const res = await uploadMutation.mutateAsync(file);
+      filePath = res?.filePath;
     }
-  );
-}
 
+    // 🔹 1. OPTIMISTIC UI UPDATE (IMMEDIATE)
+    const optimisticMessage: MessageResponseDto = {
+      _id: tempId,
+      conversationId,
+      senderId: senderId!,
+      text: text.trim(),
+
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    // queryClient.setQueryData<MessageResponseDto[]>( ["messages", conversationId], (old = []) => [...old, optimisticMessage] );
+    queryClient.setQueryData(
+      ["messages", conversationId],
+      (old: InfiniteData<MessagePage>) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          pages: [
+            {
+              ...old.pages[0],
+              messages: [...old.pages[0].messages, optimisticMessage],
+            },
+            ...old.pages.slice(1),
+          ],
+        };
+      }
+    );
+
+    setText("");
+    setFile(null);
+
+    sendMessage(
+      {
+        conversationId,
+        senderId,
+        text: text.trim(),
+        filePath,
+        tempId,
+      },
+      (savedMsg) => {
+        // queryClient.setQueryData<MessageResponseDto[]>(
+        //   ["messages", conversationId],
+        //   (old = []) =>
+        //     old.map((msg) =>
+        //       msg._id === tempId ? savedMsg : msg
+        //     )
+        // );
+        queryClient.setQueryData(
+          ["messages", conversationId],
+          (old: InfiniteData<MessagePage>) => {
+            if (!old) return old;
+
+            return {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                messages: page.messages.map((msg) =>
+                  msg._id === tempId ? savedMsg : msg
+                ),
+              })),
+            };
+          }
+        );
+      },
+      (err) => {
+        console.error("Message send failed:", err);
+
+        // optional: mark failed or remove temp message
+        // queryClient.setQueryData<MessageResponseDto[]>(
+        //   ["messages", conversationId],
+        //   (old = []) => old.filter((m) => m._id !== tempId)
+        // );
+        queryClient.setQueryData(
+          ["messages", conversationId],
+          (old: InfiniteData<MessagePage>) => {
+            if (!old) return old;
+
+            return {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                messages: page.messages.filter((m) => m._id !== tempId),
+              })),
+            };
+          }
+        );
+      }
+    );
+  }
 
   return (
     <div className="flex items-center gap-2 p-2 bg-third rounded-xl w-[88vw] sm:w-full">

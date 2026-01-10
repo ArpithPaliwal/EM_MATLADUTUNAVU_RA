@@ -34,7 +34,7 @@ export class MessageRepository implements IMessageRepository {
         conversationId: string,
         userId: string,
         cursor: string | undefined,
-        limit: number = 20
+        limit: number = 7
     ): Promise<any> {
         const convo = await Conversation.findOne({
             _id: new mongoose.Types.ObjectId(conversationId),

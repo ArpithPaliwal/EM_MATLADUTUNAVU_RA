@@ -32,23 +32,29 @@ export class MessageController implements IMessageControllerInterface {
     }
     )
     getMessages = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { conversationId } = req.params;
-        const userId = req.user?._id;
+  const { conversationId } = req.params;
+  const { cursor } = req.query;
+  const userId = req.user?._id;
 
-        if (!conversationId || !userId) {
-            res.status(400).json(
-                new ApiResponse(400, null, "Missing required fields")
-            );
-            return;
-        }
-        const messages = await this.messageService.getMessages(conversationId, userId);
+  if (!conversationId || !userId) {
+    res.status(400).json(
+      new ApiResponse(400, null, "Missing required fields")
+    );
+    return;
+  }
 
-        res.status(200).json(
-            new ApiResponse(200, messages, "Messages retrieved successfully")
-        );
+  const data = await this.messageService.getMessages(
+    conversationId,
+    userId,
+    cursor as string | undefined
+  );
 
-    }
-    )
+  res.status(200).json(
+    new ApiResponse(200, data, "Messages retrieved successfully")
+  );
+});
+
+    
     uploadFile = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         
         const userId = req.user?._id;

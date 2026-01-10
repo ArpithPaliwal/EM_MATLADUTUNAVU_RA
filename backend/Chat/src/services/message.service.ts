@@ -7,7 +7,7 @@ import type { IConversationService } from "./interfaces/conversation.service.int
 import { ConversationService } from "./conversation.service.js";
 import type { MessageResponseDto } from "../dtos/message.dto.js";
 export class MessageService implements IMessageService {
-    constructor(private messageRepository: IMessageRepository = new MessageRepository(),private conversationService:IConversationService = new ConversationService()) { }
+    constructor(private messageRepository: IMessageRepository = new MessageRepository(), private conversationService: IConversationService = new ConversationService()) { }
     async createMessage(conversationId: string, senderId: string, text: string, imageOrVideoPath?: string): Promise<any> {
         // Implementation for creating a message
         if (!senderId || !conversationId) {
@@ -16,7 +16,7 @@ export class MessageService implements IMessageService {
         if (!text && !imageOrVideoPath) {
             throw new Error("Message content cannot be empty");
         }
-        
+
         const messageData: any = {
             conversationId,
             senderId,
@@ -38,16 +38,25 @@ export class MessageService implements IMessageService {
         }
         const message = await this.messageRepository.createMessage(messageData.conversationId, messageData.senderId, messageData.text, messageData.imageUrl, messageData.videoUrl, messageData.imagePublicId, messageData.videoPublicId);
         await this.conversationService.updateConversationLastMessage(conversationId, message._id, text, senderId, message.createdAt);
-        
-        
+
+
         return message;
     }
-    async getMessages(conversationId: string, userId: string): Promise<MessageResponseDto[]> {
-        // Implementation for retrieving messages
+    async getMessages(
+        conversationId: string,
+        userId: string,
+        cursor?: string 
+    ): Promise<{ messages: MessageResponseDto[]; nextCursor: string | null }> {
+
         if (!conversationId || !userId) {
             throw new Error("Invalid conversation or user");
         }
-        const messages = await this.messageRepository.getMessages(conversationId, userId);
-        return messages;
+
+        return await this.messageRepository.getMessages(
+            conversationId,
+            userId,
+            cursor
+        );
     }
+
 }
