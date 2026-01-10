@@ -7,15 +7,14 @@ import Toast from "../../utils/Toast";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/authSlice";
 import type { RegisterResponseDto } from "../../dto/auth.dto";
-import {  loginUser } from "../../API/userApi";
-
+import { loginUser } from "../../API/userApi";
 import { useNavigate } from "react-router";
 import type { ApiError } from "../../dto/apiError";
-import nameDarkTheme from "../../assets/name_dark-theme.svg"
-import nameLightTheme from "../../assets/name_light-theme.svg"
+import nameDarkTheme from "../../assets/name_dark-theme.svg";
+import nameLightTheme from "../../assets/name_light-theme.svg";
 const signupSchema = z.object({
   username: z.string().min(2, "Username must be at least 2 characters long"),
-  
+
   password: z
     .string()
     .min(6, "Password must be at least 6 characters long")
@@ -23,7 +22,6 @@ const signupSchema = z.object({
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{4,}$/,
       "Password must contain at least one letter, one number, and one special character"
     ),
-  
 });
 interface ToastState {
   type: "success" | "error";
@@ -60,7 +58,7 @@ function LoginPage() {
   });
   const onSubmit = (data: z.infer<typeof signupSchema>) => {
     console.log("validated data:", data);
-    
+
     mutation.mutate(data);
   };
   const isDark = document.documentElement.dataset.theme === "dark";
@@ -68,7 +66,6 @@ function LoginPage() {
     <div className="relative flex justify-center items-center bg-primary overflow-hidden p-4 min-h-screen">
       <div className="w-full max-w-md bg-accent border border-[#0096c7]/30 p-7 rounded-2xl shadow-lg flex justify-center items-center flex-col">
         <div className="md:h-[20vh] md:w-[20vw]">
-          
           <img
             src={isDark ? nameDarkTheme : nameLightTheme}
             className="  h-full w-full object-contain"
@@ -91,8 +88,6 @@ function LoginPage() {
             </p>
           </div>
 
-          
-
           {/* Password */}
           <div>
             <label className="block text-sm font-semibold text-primary mb-1">
@@ -108,8 +103,6 @@ function LoginPage() {
               {errors.password?.message}
             </p>
           </div>
-
-          
 
           {/* Submit */}
           <button

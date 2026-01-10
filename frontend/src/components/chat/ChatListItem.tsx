@@ -35,7 +35,7 @@ export default function ChatListItem({
 };
   return (
     <div
-      className={`flex items-center gap-3 p-3 cursor-pointer rounded-2xl
+      className={`flex items-center gap-3 p-3 cursor-pointer rounded-2xl w-full
         ${isActive ? "bg-secondary" : "hover:bg-blue-400"}`}
       onClick={() => {
         onSelect(conversation);

@@ -26,11 +26,11 @@ export default function ConversationListHeader() {
   // };
 
   return (
-    <div className="font-semibold text-lg mb-3 flex gap-1">
+    <div className="font-semibold text-lg mb-3 flex gap-1 w-full">
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="border-2 border-blue-200 rounded-xl px-2 text-primary "
+        className="border-2 border-blue-200 rounded-xl px-2 text-primary w-full"
         placeholder="Enter username"
       />
       <div>
