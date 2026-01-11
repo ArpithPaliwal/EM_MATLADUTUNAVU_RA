@@ -47,14 +47,31 @@ export class AuthRepository implements IAuthRepository {
         return await User.find({ _id: { $in: userIds } }, { username: 1, avatar: 1 }).lean();
     }
     async getUserInfoByUsername(username: string): Promise<any> {
-         const details= await User.findOne(
+        const details = await User.findOne(
             { username },
             { _id: 1, username: 1, avatar: 1 }
         ).lean();
         console.log(details);
-        
+
         return details
     }
+    async getUserNames(prefix: string): Promise<any[]> {
+  const safePrefix = prefix.trim();
+
+  if (!safePrefix) return [];
+
+  const users = await User.find({
+    username: {
+      $regex: `^${safePrefix}`,
+      $options: "i",
+    },
+  })
+    .limit(10)
+    .select("username")
+    .lean();
+
+  return users;
+}
 
 
 

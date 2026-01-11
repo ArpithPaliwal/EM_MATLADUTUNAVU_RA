@@ -184,4 +184,23 @@ export class AuthController implements IAuthController {
       )
     } 
   )
+  getUserNames = asyncHandler(
+    async (req: Request, res: Response): Promise<Response> => {
+      console.log("the data ",req.body);
+      
+      const {prefix}= req.body; 
+      
+      
+      if(!prefix){
+        throw new ApiError(400,"prefix cannot be undefined")
+      }
+      const usernames = await this.authService.getUserNames(prefix);  
+      console.log("usernames",usernames);
+      
+      
+      return res.status(200).json(
+        new ApiResponse(200,  usernames , "Usernames fetched successfully")
+      )
+    } 
+  )
 }

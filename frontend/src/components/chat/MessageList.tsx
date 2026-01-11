@@ -51,15 +51,13 @@ export default function MessageList({ conversationId }: Props) {
   ).sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
-  useEffect(() => {
-    if (!conversationId) return;
 
-    queryClient.removeQueries({
-      queryKey: ["messages", conversationId],
-      exact: true,
-    });
+useEffect(() => {
+    if (conversationId) {
+      // clear cache and start fresh (good for fixing scroll glitches on load)
+      queryClient.resetQueries({ queryKey: ["messages", conversationId] });
+    }
   }, [conversationId, queryClient]);
-
   /* --------------------------------------------------
      ⚡ SCROLL RESTORATION (The Fix)
   -------------------------------------------------- */

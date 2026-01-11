@@ -18,6 +18,7 @@ import { generateAccessToken, generateRefreshToken } from "../utils/jwt.utils.js
 import type { LoginDTO } from "../dtos/login.dto.js";
 import { rateLimit } from "../redis/redisRateLimit.service.js";
 import type { UserDetailsSummaryDTO } from "../dtos/userDetailsSummary.dto.js";
+import { redisClient } from "../redis/index.js";
 
 const tempFolder = path.resolve("public", "temp");
 export class AuthService implements IAuthService {
@@ -252,12 +253,44 @@ export class AuthService implements IAuthService {
             throw new ApiError(404, "User not found");
         }
         console.log(user);
-        
+
         return {
             id: user._id.toString(),
             username: user.username,
             avatar: user.avatar,
         };
     }
+    async getUserNames(prefix: string): Promise<string[]> {
+        console.log("here",prefix);
+        
+        const redisKey = "usernames:index";
 
+        const safePrefix = prefix.trim().toLowerCase();
+
+        if (!safePrefix) return [];
+
+        const min = `[${safePrefix}`;
+        const max = `[${safePrefix}\xff`;
+
+        const cached = await redisClient.zRangeByLex(redisKey, min, max, {
+            LIMIT: { offset: 0, count: 10 },
+        });
+
+        console.log("cache service", cached);
+
+        if (cached.length > 0) return cached;
+
+        const users = await this.authrepository.getUserNames(prefix);
+
+        for (const u of users) {
+            await redisClient.zAdd(redisKey, {
+                score: 0,
+                value: u.username.toLowerCase(),
+            });
+        }
+
+        console.log("usernames service", users);
+
+        return users.map((u: any) => u.username);
+    }
 }

@@ -91,3 +91,29 @@ export const loginUser = async (data: {username:string,password:string}):Promise
     } as ApiError;
   }
 }
+
+export const getUserNames = async (prefix:string):Promise<string[]> =>{
+    try {
+        console.log(prefix);
+        
+         const res = await api.post("/users/getUserNames",{ prefix:prefix});   
+    return res.data.data ;
+    } catch (error:unknown) {
+    if (error instanceof AxiosError && error?.response) {
+      const apiError: ApiError = {
+
+        status: error.response.status,      
+        message: error.response.data.message,
+        errors: error.response.data.errors || [],
+      };
+
+      throw apiError;
+    }
+
+    throw {
+      status: 500,
+      message: "Network error or server is down",
+      errors: [],
+    } as ApiError;
+  }
+}

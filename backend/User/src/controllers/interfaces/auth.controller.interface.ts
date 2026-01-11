@@ -10,4 +10,5 @@ export interface IAuthController {
   updatePassword: RequestHandler;
   getUserInBulk: RequestHandler;
   getUserInfoByUsername:RequestHandler;
+  getUserNames:RequestHandler
 }

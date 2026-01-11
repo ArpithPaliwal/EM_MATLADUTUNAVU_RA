@@ -13,5 +13,6 @@ export interface IAuthService {
     updatePassword(username: SignupInitiateDTO, userId: string, currentPassword: string, newPassword: string): Promise<void>;
     getUserInBulk(userIds: string[]): Promise<UserDetailsSummaryDTO[]>;
     getUserInfoByUsername(username:string):Promise<UserDetailsSummaryDTO>;
+    getUserNames(prefix:string):Promise<string[]>;
 }
 

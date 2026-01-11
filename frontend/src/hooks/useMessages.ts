@@ -8,7 +8,7 @@ export function useMessages(conversationId: string) {
         queryFn: ({pageParam}) => getMessages(conversationId,pageParam),
         getNextPageParam: (lastPage) => lastPage.nextCursor,
         staleTime: 60_000,          
-        refetchOnWindowFocus: false,
+        refetchOnWindowFocus: true,
         
     })
 }

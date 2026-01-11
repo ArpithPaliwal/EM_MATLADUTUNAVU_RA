@@ -12,5 +12,5 @@ export interface IAuthRepository {
     updatePassword(userId: string, hashedPassword: string): Promise<any>;
     getUserInBulk(userIds: string[]): Promise<any[]>;
     getUserInfoByUsername(username: string): Promise<any>;
-    
+    getUserNames(prefix:string):Promise<any>;
 }
