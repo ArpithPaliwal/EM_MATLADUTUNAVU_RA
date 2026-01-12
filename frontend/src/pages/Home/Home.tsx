@@ -10,6 +10,7 @@ import nameDarkTheme from "../../assets/name_dark-theme.svg";
 import nameLightTheme from "../../assets/name_light-theme.svg";
 import ThemeToggle from "../../utils/ThemeToggle";
 import type { RootState } from "../../store/store";
+import { Link } from "react-router-dom";
 type UserData = {
   avatar: string;
   _id: string;
@@ -69,6 +70,7 @@ function Home() {
         </div>
         <div className="flex gap-5 items-center">
           <ThemeToggle />
+          <Link to={"/DashBoard"}>
           <div className="h-10 w-10 md:h-11 md:w-11 overflow-hidden rounded-full border border-blue-500 shadow-sm">
             <img
               className="h-full w-full object-cover"
@@ -76,6 +78,7 @@ function Home() {
               alt="Profile"
             />
           </div>
+          </Link>
         </div>
       </div>
 
