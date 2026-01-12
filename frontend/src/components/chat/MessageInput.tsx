@@ -48,6 +48,23 @@ export default function MessageInput({ conversationId, senderId }: Props) {
   //     }
   //   );
   // }
+  function rollback(tempId: string) {
+    queryClient.setQueryData(
+      ["messages", conversationId],
+      (old: InfiniteData<MessagePage>) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            messages: page.messages.filter((m) => m._id !== tempId),
+          })),
+        };
+      }
+    );
+  }
+
   async function send() {
     const hasText = !!text.trim();
     const hasFile = !!file;
@@ -57,12 +74,6 @@ export default function MessageInput({ conversationId, senderId }: Props) {
     const tempId = crypto.randomUUID();
 
     let filePath: string | undefined;
-
-    // upload file first (this is fine)
-    if (hasFile) {
-      const res = await uploadMutation.mutateAsync(file);
-      filePath = res?.filePath;
-    }
 
     // 🔹 1. OPTIMISTIC UI UPDATE (IMMEDIATE)
     const optimisticMessage: MessageResponseDto = {
@@ -95,64 +106,117 @@ export default function MessageInput({ conversationId, senderId }: Props) {
 
     setText("");
     setFile(null);
+    // upload file first (this is fine)
+    // if (hasFile) {
+    //   const res = await uploadMutation.mutateAsync({
+    //     file,
+    //     text: text.trim(),
+    //   });
 
-    sendMessage(
-      {
-        conversationId,
-        senderId,
-        text: text.trim(),
-        filePath,
-        tempId,
-      },
-      (savedMsg) => {
-        // queryClient.setQueryData<MessageResponseDto[]>(
-        //   ["messages", conversationId],
-        //   (old = []) =>
-        //     old.map((msg) =>
-        //       msg._id === tempId ? savedMsg : msg
-        //     )
-        // );
-        queryClient.setQueryData(
-          ["messages", conversationId],
-          (old: InfiniteData<MessagePage>) => {
-            if (!old) return old;
+    //   filePath = res?.filePath;
+    // }
+    // sendMessage(
+    //   {
+    //     conversationId,
+    //     senderId,
+    //     text: text.trim(),
+    //     filePath,
+    //     tempId,
+    //   },
+    //   (savedMsg) => {
+    //     // queryClient.setQueryData<MessageResponseDto[]>(
+    //     //   ["messages", conversationId],
+    //     //   (old = []) =>
+    //     //     old.map((msg) =>
+    //     //       msg._id === tempId ? savedMsg : msg
+    //     //     )
+    //     // );
+    //     queryClient.setQueryData(
+    //       ["messages", conversationId],
+    //       (old: InfiniteData<MessagePage>) => {
+    //         if (!old) return old;
 
-            return {
-              ...old,
-              pages: old.pages.map((page) => ({
-                ...page,
-                messages: page.messages.map((msg) =>
-                  msg._id === tempId ? savedMsg : msg
-                ),
-              })),
-            };
-          }
-        );
-      },
-      (err) => {
-        console.error("Message send failed:", err);
+    //         return {
+    //           ...old,
+    //           pages: old.pages.map((page) => ({
+    //             ...page,
+    //             messages: page.messages.map((msg) =>
+    //               msg._id === tempId ? savedMsg : msg
+    //             ),
+    //           })),
+    //         };
+    //       }
+    //     );
+    //   },
+    //   (err) => {
+    //     console.error("Message send failed:", err);
 
-        // optional: mark failed or remove temp message
-        // queryClient.setQueryData<MessageResponseDto[]>(
-        //   ["messages", conversationId],
-        //   (old = []) => old.filter((m) => m._id !== tempId)
-        // );
-        queryClient.setQueryData(
-          ["messages", conversationId],
-          (old: InfiniteData<MessagePage>) => {
-            if (!old) return old;
+    //     // optional: mark failed or remove temp message
+    //     // queryClient.setQueryData<MessageResponseDto[]>(
+    //     //   ["messages", conversationId],
+    //     //   (old = []) => old.filter((m) => m._id !== tempId)
+    //     // );
+    //     queryClient.setQueryData(
+    //       ["messages", conversationId],
+    //       (old: InfiniteData<MessagePage>) => {
+    //         if (!old) return old;
 
-            return {
-              ...old,
-              pages: old.pages.map((page) => ({
-                ...page,
-                messages: page.messages.filter((m) => m._id !== tempId),
-              })),
-            };
-          }
-        );
+    //         return {
+    //           ...old,
+    //           pages: old.pages.map((page) => ({
+    //             ...page,
+    //             messages: page.messages.filter((m) => m._id !== tempId),
+    //           })),
+    //         };
+    //       }
+    //     );
+    //   }
+    // );
+
+    try {
+      if (hasFile) {
+        await uploadMutation.mutateAsync({
+          file,
+          text: text.trim(),
+          conversationId,
+        });
+
+        return; // backend will emit socket
       }
-    );
+
+      // TEXT ONLY → SOCKET
+      sendMessage(
+        {
+          conversationId,
+          senderId,
+          text: text.trim(),
+          filePath,
+          tempId,
+        },
+        (savedMsg) => {
+          queryClient.setQueryData(
+            ["messages", conversationId],
+            (old: InfiniteData<MessagePage>) => {
+              if (!old) return old;
+
+              return {
+                ...old,
+                pages: old.pages.map((page) => ({
+                  ...page,
+                  messages: page.messages.map((msg) =>
+                    msg._id === tempId ? savedMsg : msg
+                  ),
+                })),
+              };
+            }
+          );
+        },
+        () => rollback(tempId)
+      );
+    } catch (err) {
+      console.error("Message send failed:", err);
+      rollback(tempId);
+    }
   }
 
   return (

@@ -30,6 +30,7 @@ export function useCreatePrivateConversation() {
     onError: (error) => {
       console.error("Failed to create private conversation");
       console.error("Error message:", error.message);
+      
     },
   });
 }

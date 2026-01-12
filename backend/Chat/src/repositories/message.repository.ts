@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { Message } from '../models/message.model.js';
 import type { IMessageRepository } from '../repositories/interfaces/message.repository.interface.js';
 import { Conversation } from '../models/conversation.model.js';
+import { ApiError } from '../utils/apiError.js';
 export class MessageRepository implements IMessageRepository {
     async createMessage(
         conversationId: string,
@@ -68,4 +69,17 @@ export class MessageRepository implements IMessageRepository {
         return {messages:messages.reverse(),
             nextCursor:hasNext? messages[0]._id : null};
     }
+    async deleteMessage(messageId: string, senderId: string): Promise<any> {
+  const deletedMessage = await Message.findOneAndDelete({
+    _id: new mongoose.Types.ObjectId(messageId),
+    senderId: new mongoose.Types.ObjectId(senderId),
+  }).lean();
+
+  if (!deletedMessage) {
+    throw new ApiError(404, "Message not found or not authorized");
+  }
+
+  return deletedMessage;
+}
+
 }

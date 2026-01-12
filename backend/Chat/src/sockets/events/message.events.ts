@@ -71,7 +71,14 @@ export const emitMessageEvents = async (
     // );
   }
 }
+export const emitMessageDeleteEvents = (io: Server, message: any) => {
+  console.log("emitmesgdlt", message._id.toString());
 
+  io.to(`conversation:${message.conversationId.toString()}`).emit("message:deleted", {
+  messageId: message._id.toString(),
+});
+
+};
 
 
 

@@ -68,8 +68,19 @@ export const onMessageDeleted = (
   cb: (payload: { messageId: string }) => void
 ) => {
   socket.on("message:deleted", cb);
-
   return () => socket.off("message:deleted", cb);
+};
+
+
+
+
+export const deleteMessage = (payload: {
+  messageId: string;
+  senderId: string;
+}) => {
+  console.log("frontend dlt ",payload);
+  
+  socket.emit("message:delete", payload);
 };
 
 type SendMessageAck =

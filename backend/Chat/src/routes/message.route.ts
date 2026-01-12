@@ -11,6 +11,6 @@ router
   .route("/sendMessage")
   .post(upload.single("attachment"), messageController.sendMessage);
 router.route("/getMessages/:conversationId").get(messageController.getMessages);
-router.route("/uploadFile").post(upload.single("userUploadedMediaFile"),messageController.uploadFile)
+
 
 export default router;

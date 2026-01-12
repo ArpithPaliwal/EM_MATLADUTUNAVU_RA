@@ -6,6 +6,8 @@ import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js
 import type { IConversationService } from "./interfaces/conversation.service.interface.js";
 import { ConversationService } from "./conversation.service.js";
 import type { MessageResponseDto } from "../dtos/message.dto.js";
+import { ApiError } from "../utils/apiError.js";
+
 export class MessageService implements IMessageService {
     constructor(private messageRepository: IMessageRepository = new MessageRepository(), private conversationService: IConversationService = new ConversationService()) { }
     async createMessage(conversationId: string, senderId: string, text: string, imageOrVideoPath?: string): Promise<any> {
@@ -45,7 +47,7 @@ export class MessageService implements IMessageService {
     async getMessages(
         conversationId: string,
         userId: string,
-        cursor?: string 
+        cursor?: string
     ): Promise<{ messages: MessageResponseDto[]; nextCursor: string | null }> {
 
         if (!conversationId || !userId) {
@@ -57,6 +59,30 @@ export class MessageService implements IMessageService {
             userId,
             cursor
         );
+    }
+    async deleteMessage(messageId: string, senderId: string): Promise<any> {
+        const messageDetails = await this.messageRepository.deleteMessage(
+            messageId,
+            senderId
+        );
+
+        if (!messageDetails) {
+            throw new ApiError(404, "Message not found");
+        }
+
+        try {
+            if (messageDetails.imagePublicId) {
+                await deleteFromCloudinary(messageDetails.imagePublicId);
+            }
+
+            if (messageDetails.videoPublicId) {
+                await deleteFromCloudinary(messageDetails.videoPublicId);
+            }
+        } catch (error) {
+            console.error("Cloudinary delete failed:", error);
+        }
+
+        return messageDetails;
     }
 
 }

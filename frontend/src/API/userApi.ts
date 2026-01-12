@@ -95,9 +95,12 @@ export const loginUser = async (data: {username:string,password:string}):Promise
 export const getUserNames = async (prefix:string):Promise<string[]> =>{
     try {
         console.log(prefix);
-        
-         const res = await api.post("/users/getUserNames",{ prefix:prefix});   
-    return res.data.data ;
+        let res=null;
+        if(prefix!=null){
+           res = await api.post("/users/getUserNames",{ prefix:prefix});
+        }
+            
+    return res?.data.data ;
     } catch (error:unknown) {
     if (error instanceof AxiosError && error?.response) {
       const apiError: ApiError = {

@@ -4,18 +4,17 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import type { IMessageControllerInterface } from "./interfaces/message.contoller.interface.js";
 import type { IMessageService } from "../services/interfaces/message.service.interface.js";
 import { MessageService } from "../services/message.service.js";
-import type { ParamsDictionary } from "express-serve-static-core";
-import type { ParsedQs } from "qs";
-
+import { emitMessageEvents } from "../sockets/events/message.events.js";
+import { getIO } from "../sockets/socket.server.js";
 
 
 export class MessageController implements IMessageControllerInterface {
     constructor(private messageService: IMessageService = new MessageService()) { }
     sendMessage = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        
+
         const { conversationId, text } = req.body;
         const senderId = req.user?._id;
-        
+
         console.log("Received message data:", { conversationId, text, senderId });
         const ImageOrVideoPath = req.file?.path || "";
         if (!conversationId || !senderId || (!text && !ImageOrVideoPath)) {
@@ -24,54 +23,58 @@ export class MessageController implements IMessageControllerInterface {
             );
             return;
         }
-        const message = await this.messageService.createMessage(conversationId, senderId, text || "",ImageOrVideoPath);
-
+        const message = await this.messageService.createMessage(conversationId, senderId, text || "", ImageOrVideoPath);
+        emitMessageEvents(getIO(), message);
         res.status(201).json(
             new ApiResponse(201, message, "Message sent successfully")
         );
     }
     )
     getMessages = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-  const { conversationId } = req.params;
-  const { cursor } = req.query;
-  const userId = req.user?._id;
-
-  if (!conversationId || !userId) {
-    res.status(400).json(
-      new ApiResponse(400, null, "Missing required fields")
-    );
-    return;
-  }
-
-  const data = await this.messageService.getMessages(
-    conversationId,
-    userId,
-    cursor as string | undefined
-  );
-
-  res.status(200).json(
-    new ApiResponse(200, data, "Messages retrieved successfully")
-  );
-});
-
-    
-    uploadFile = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        
+        const { conversationId } = req.params;
+        const { cursor } = req.query;
         const userId = req.user?._id;
 
-        if (!userId) {
+        if (!conversationId || !userId) {
             res.status(400).json(
                 new ApiResponse(400, null, "Missing required fields")
             );
             return;
         }
-        
-        const ImageOrVideoPath = req.file?.path || "";
-        res.status(200).json(
-            new ApiResponse(200, ImageOrVideoPath, "UPLOADED TO MULTER successfully")
+
+        const data = await this.messageService.getMessages(
+            conversationId,
+            userId,
+            cursor as string | undefined
         );
 
-    }
-    )
+        res.status(200).json(
+            new ApiResponse(200, data, "Messages retrieved successfully")
+        );
+    });
+    deleteMessage = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        const { messageId } = req.params;
+        
+        const userId = req.user?._id;
+
+        if (!messageId || !userId) {
+            res.status(400).json(
+                new ApiResponse(400, null, "Missing required fields")
+            );
+            return;
+        }
+
+        const data = await this.messageService.deleteMessage(
+            messageId,
+            userId,
+           
+        );
+
+        res.status(200).json(
+            new ApiResponse(200, data, "Messages deleted successfully")
+        );
+    });
+
+    
 }
 

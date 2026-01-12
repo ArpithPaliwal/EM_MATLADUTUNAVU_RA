@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { Message } from "../../models/message.model.js";
 import { MessageService } from "../../services/message.service.js";
-import { emitMessageEvents } from "./message.events.js";
+import { emitMessageDeleteEvents, emitMessageEvents } from "./message.events.js";
 import { ConversationParticipantService } from "../../services/conversationParticipant.service.js";
 
 const messageService = new MessageService();
@@ -67,6 +67,24 @@ export const registerConversationEvents = (
     } catch (err: any) {
       console.error("message:send failed:", err);
       ack?.({ ok: false, error: err.message || "Something went wrong" });
+    }
+  }
+);
+socket.on(
+  "message:delete",
+  async (payload: { messageId: string; senderId: string }) => {
+    try {
+      const { messageId, senderId } = payload;
+      console.log("dletmessdetails",payload)
+      const deletedMessage = await messageService.deleteMessage(
+        messageId,
+        senderId
+      );
+
+      emitMessageDeleteEvents(io, deletedMessage);
+
+    } catch (err: any) {
+      console.error("message:delete failed:", err);
     }
   }
 );

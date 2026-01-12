@@ -28,9 +28,19 @@ const messageSchema = new Schema<IMessage>(
       trim: true,
       
   },
+  imagePublicId: {
+      type: String,
+      trim: true,
+      
+  },
     videoUrl: {
       type: String,
       trim: true,   
+  },
+  videoPublicId: {
+      type: String,
+      trim: true,
+      
   },
 
     

@@ -1,7 +1,7 @@
 import api from "../utils/axiosinstanceChat.js";
 import { AxiosError } from "axios";
 import type {ApiError} from "../dto/apiError"
-import type { MessagePage } from "../dto/messages.dto.js";
+import type { MessagePage, MessageResponseDto } from "../dto/messages.dto.js";
 import { createFormData } from "../utils/createFormData.js";
 
 
@@ -39,25 +39,26 @@ export const  getMessages= async (conversationId:string,cursor:string | null ):P
 }
 
 
-
 export const uploadMedia = async (
-  file: File
-): Promise<{ filePath: string }> => {
-  try {
-    const form = createFormData({ userUploadedMediaFile: file });
+   payload: { file: File; text: string; conversationId: string }
+): Promise<MessageResponseDto> => {
+  try{
+  const form = createFormData({
+    attachment: payload.file,          
+    text: payload.text,
+    conversationId: payload.conversationId,
+  });
 
-
-    const res = await api.post(
-      "/chat/messages/uploadFile",
-      form,
-      { withCredentials: true }
-    );
-
-    return res.data.data;   // assuming { data: { filePath } }
-  } 
-  catch (error: unknown) {
-
-    if (error instanceof AxiosError && error?.response) {
+  const res = await api.post(
+    "/chat/messages/sendMessage",
+    form,
+    { withCredentials: true }
+  );
+  console.log("returned data",res.data.data);
+  
+  return res.data.data; 
+  } catch (error: unknown) {
+    if (error instanceof AxiosError && error.response) {
       const apiError: ApiError = {
         status: error.response.status,
         message: error.response.data.message,
