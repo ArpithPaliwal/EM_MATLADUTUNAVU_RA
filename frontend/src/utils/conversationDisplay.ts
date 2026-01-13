@@ -14,5 +14,8 @@ export function getConversationDisplay(conversation: ConversationListResponseDto
   return {
     name: name ?? "Unknown",
     avatar: avatar ?? "/default-avatar.png",
+    type:conversation.type,
+    _id:conversation._id
+    
   };
 }

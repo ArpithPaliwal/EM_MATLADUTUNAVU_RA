@@ -123,7 +123,7 @@ export const getUserNames = async (prefix: string): Promise<string[]> => {
 
 export const updateUsername = async (
   username: string
-): Promise<void> => {
+): Promise<{username:string}> => {
   try {
     const res = await api.patch("/users/updateUsername", { username });
     return res.data.data;
@@ -148,7 +148,7 @@ export const updateUsername = async (
 
 export const updateAvatar = async (
   file: File
-): Promise<void> => {
+): Promise<{avatar:string}> => {
   try {
     const form = new FormData();
     form.append("avatar", file);
@@ -193,4 +193,14 @@ export const updatePassword = async (
       errors: [],
     } as ApiError;
   }
+};
+export const updateGroupName = (payload) =>
+  api.patch("/group/update-name", payload);
+
+export const updateGroupAvatar = (payload) => {
+  const form = new FormData();
+  form.append("file", payload.file);
+  form.append("groupId", payload.groupId);
+
+  return api.patch("/group/update-avatar", form);
 };
