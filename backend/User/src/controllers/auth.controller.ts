@@ -3,7 +3,7 @@ import type { IAuthController } from "./interfaces/auth.controller.interface.js"
 import type { IAuthService } from "../services/interfaces/auth.service.interface.js";
 import { AuthService } from "../services/auth.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-
+import fs from "fs"
 import { ApiResponse } from "../utils/apiResponse.js";
 import type { SignupInitiateDTO } from "../dtos/signup.dto.js";
 import { ApiError } from "../utils/apiError.js";
@@ -16,19 +16,34 @@ export class AuthController implements IAuthController {
 
   }
   signupInitiate = asyncHandler(
-    async (req: Request, res: Response): Promise<Response> => {
-      const signupData: SignupInitiateDTO = req.body;
-      const avatarLocalPath = req.file?.path;
+  async (req: Request, res: Response): Promise<Response> => {
+
+    const signupData: SignupInitiateDTO = req.body;
+    const avatarLocalPath = req.file?.path;
+
+    try {
       await this.authService.signupInitiate(signupData, avatarLocalPath);
 
       return res
         .status(201)
         .json(
-          new ApiResponse(200, null, 'verification code sent to email')
+          new ApiResponse(200, null, "verification code sent to email")
         );
 
+    } catch (error) {
+
+      
+      if (avatarLocalPath) {
+        try {
+          await fs.promises.unlink(avatarLocalPath);
+        } catch {}
+      }
+
+      throw error;
     }
-  );
+  }
+);
+
   signupVerifyCode = asyncHandler(
     async (req: Request, res: Response): Promise<Response> => {
       const { email, otp } = req.body;
@@ -123,21 +138,45 @@ export class AuthController implements IAuthController {
     }
   )
   updateAvatar = asyncHandler(
-    async (req: Request, res: Response): Promise<Response> => {
-      const userId = req.user?._id;
-      const avatarLocalPath:string | undefined = req.file?.path;
+  async (req: Request, res: Response): Promise<Response> => {
+
+    const userId = req.user?._id;
+    const avatarLocalPath: string | undefined = req.file?.path;
+
+    try {
       if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is required");
       }
-      const updatedAvatarUrl:string | undefined = await this.authService.updateAvatar(userId, avatarLocalPath);
-      if(!updatedAvatarUrl){
+
+      const updatedAvatarUrl: string | undefined =
+        await this.authService.updateAvatar(userId, avatarLocalPath);
+
+      if (!updatedAvatarUrl) {
         throw new ApiError(500, "Failed to update avatar");
       }
+
       return res.status(200).json(
-        new ApiResponse(200, { avatarUrl: updatedAvatarUrl }, "Avatar updated successfully")
-      )
-    } 
-  )
+        new ApiResponse(
+          200,
+          { avatarUrl: updatedAvatarUrl },
+          "Avatar updated successfully"
+        )
+      );
+
+    } catch (error) {
+
+      
+      if (avatarLocalPath) {
+        try {
+          await fs.promises.unlink(avatarLocalPath);
+        } catch {}
+      }
+
+      throw error;
+    }
+  }
+);
+
   updatePassword = asyncHandler(
     async (req: Request, res: Response): Promise<Response> => {
       const username = req.user?.username;

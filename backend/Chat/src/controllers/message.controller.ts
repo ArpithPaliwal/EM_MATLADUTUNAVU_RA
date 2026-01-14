@@ -6,30 +6,48 @@ import type { IMessageService } from "../services/interfaces/message.service.int
 import { MessageService } from "../services/message.service.js";
 import { emitMessageEvents } from "../sockets/events/message.events.js";
 import { getIO } from "../sockets/socket.server.js";
-
+import fs from "fs"
+import { ApiError } from "../utils/apiError.js";
 
 export class MessageController implements IMessageControllerInterface {
     constructor(private messageService: IMessageService = new MessageService()) { }
     sendMessage = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-
         const { conversationId, text } = req.body;
         const senderId = req.user?._id;
-
-        console.log("Received message data:", { conversationId, text, senderId });
         const ImageOrVideoPath = req.file?.path || "";
-        if (!conversationId || !senderId || (!text && !ImageOrVideoPath)) {
-            res.status(400).json(
-                new ApiResponse(400, null, "Missing required fields")
+
+        try {
+            if (!conversationId || !senderId || (!text && !ImageOrVideoPath)) {
+                throw new ApiError(400, "Missing required fields");
+            }
+
+            const message = await this.messageService.createMessage(
+                conversationId,
+                senderId,
+                text || "",
+                ImageOrVideoPath
             );
-            return;
+
+            emitMessageEvents(getIO(), message);
+
+            res.status(201).json(
+                new ApiResponse(201, message, "Message sent successfully")
+            );
+
+        } catch (error) {
+
+
+            if (ImageOrVideoPath) {
+                try {
+                    await fs.promises.unlink(ImageOrVideoPath);
+                } catch { }
+            }
+
+            throw error;
         }
-        const message = await this.messageService.createMessage(conversationId, senderId, text || "", ImageOrVideoPath);
-        emitMessageEvents(getIO(), message);
-        res.status(201).json(
-            new ApiResponse(201, message, "Message sent successfully")
-        );
-    }
-    )
+    });
+
+
     getMessages = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { conversationId } = req.params;
         const { cursor } = req.query;
@@ -54,7 +72,7 @@ export class MessageController implements IMessageControllerInterface {
     });
     deleteMessage = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { messageId } = req.params;
-        
+
         const userId = req.user?._id;
 
         if (!messageId || !userId) {
@@ -67,7 +85,7 @@ export class MessageController implements IMessageControllerInterface {
         const data = await this.messageService.deleteMessage(
             messageId,
             userId,
-           
+
         );
 
         res.status(200).json(
@@ -75,6 +93,6 @@ export class MessageController implements IMessageControllerInterface {
         );
     });
 
-    
+
 }
 
