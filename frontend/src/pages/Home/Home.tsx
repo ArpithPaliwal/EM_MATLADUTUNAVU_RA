@@ -10,6 +10,10 @@ import nameDarkTheme from "../../assets/name_dark-theme.svg";
 import nameLightTheme from "../../assets/name_light-theme.svg";
 import ThemeToggle from "../../utils/ThemeToggle";
 import type { RootState } from "../../store/store";
+import sound1 from "../../assets/sounds/sound1.mp3"
+import sound2 from "../../assets/sounds/sound2.mp3"
+import sound3 from "../../assets/sounds/sound3.mp3"
+
 import { Link } from "react-router-dom";
 type UserData = {
   avatar: string;
@@ -26,6 +30,17 @@ type AppState = {
 };
 
 function Home() {
+  const sounds = [
+    sound1,
+    sound2,
+    sound3,
+  ];
+   const playRandomSound = () => {
+    const randomIndex = Math.floor(Math.random() * sounds.length);
+    const audio = new Audio(sounds[randomIndex]);
+    audio.currentTime = 0;
+    audio.play();
+  };
   const [selectedChat, setSelectedChat] = useState<ConversationListResponseDto | null>(null);
   const isDark = useSelector((state: RootState) => state.theme);
   const { userData } = useSelector((state: AppState) => state.auth);
@@ -62,7 +77,7 @@ function Home() {
   return (
     <div className="px-3 h-screen overflow-hidden bg-primary w-full">
       <div className="flex items-center justify-between px-4 py-3">
-        <div className="h-10 w-32 md:h-12 md:w-40">
+        <div className="h-10 w-32 md:h-12 md:w-40" onClick={playRandomSound}>
           <img
             src={isDark === "dark" ? nameDarkTheme : nameLightTheme}
             className="h-full w-full object-contain"

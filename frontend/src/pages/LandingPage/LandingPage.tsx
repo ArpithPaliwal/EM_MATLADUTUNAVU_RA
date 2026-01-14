@@ -1,22 +1,40 @@
 import { Link } from "react-router-dom";
-import nameDarkTheme from "../../assets/name_dark-theme.svg"
-import nameLightTheme from "../../assets/name_light-theme.svg"
-
-import icon1 from "../../assets/icon-1.svg"
+import nameDarkTheme from "../../assets/name_dark-theme.svg";
+import nameLightTheme from "../../assets/name_light-theme.svg";
+import sound1 from "../../assets/sounds/sound1.mp3"
+import sound2 from "../../assets/sounds/sound2.mp3"
+import sound3 from "../../assets/sounds/sound3.mp3"
+import icon1 from "../../assets/icon-1.svg";
 import ThemeToggle from "../../utils/ThemeToggle";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 function LandingPage() {
-    const isDark = useSelector((state: RootState) => state.theme);
+  const sounds = [
+    sound1,
+    sound2,
+    sound3,
+  ];
+  const isDark = useSelector((state: RootState) => state.theme);
+  const playRandomSound = () => {
+    const randomIndex = Math.floor(Math.random() * sounds.length);
+    const audio = new Audio(sounds[randomIndex]);
+    audio.currentTime = 0;
+    audio.play();
+  };
+
   return (
     <div className="w-full  overflow-hidden ">
       <div className="bg-primary relative">
-        <div className="absolute right-2 top-2 "><ThemeToggle/></div>
-        <div className="h-full flex justify-center flex-col items-center w-screen gap-10 md:gap-0 ">
+        <div className="absolute right-2 top-2 ">
+          <ThemeToggle />
+        </div>
+        <div
+          className="h-full flex justify-center flex-col items-center w-screen gap-10 md:gap-0 "
+          onClick={playRandomSound}
+        >
           <div className="h-[90%] w-[90%] md:h-[30vh] md:w-[30vw]">
-            
             <img
-              src={isDark=="dark"? nameDarkTheme : nameLightTheme}
+              src={isDark == "dark" ? nameDarkTheme : nameLightTheme}
               className="  h-full w-full object-contain"
             />
           </div>
