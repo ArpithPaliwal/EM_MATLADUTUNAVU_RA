@@ -7,4 +7,7 @@ export interface IConversationRepository {
     getConversationMembers(conversationId: string): Promise<any>;
     getUserConversations(userId: string): Promise<any>;
     updateConversationLastMessage(conversationId: string, messageId: string, messageText: string, senderId: string,createdAt:string): Promise<any>;
+    updateGroupAvatar(groupId:string,groupAvatarUrl:string,groupAvatarPublicId:string):Promise<any>
+    updatedGroupName(groupId:string,name:string):Promise<any>
+    leaveGroup(userId:string,groupId:string):Promise<any>
 }

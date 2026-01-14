@@ -173,10 +173,10 @@ export const updateAvatar = async (
   }
 };
 export const updatePassword = async (
-  data: { oldPassword: string; newPassword: string }
+  payload:{oldPassword:string,newPassword:string}
 ): Promise<void> => {
   try {
-    const res = await api.patch("/users/updatePassword", data);
+    const res = await api.patch("/users/updatePassword", payload);
     return res.data.data;
   } catch (error: unknown) {
     if (error instanceof AxiosError && error.response) {
@@ -193,14 +193,4 @@ export const updatePassword = async (
       errors: [],
     } as ApiError;
   }
-};
-export const updateGroupName = (payload) =>
-  api.patch("/group/update-name", payload);
-
-export const updateGroupAvatar = (payload) => {
-  const form = new FormData();
-  form.append("file", payload.file);
-  form.append("groupId", payload.groupId);
-
-  return api.patch("/group/update-avatar", form);
 };

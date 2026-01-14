@@ -14,5 +14,6 @@ export interface IAuthService {
     getUserInBulk(userIds: string[]): Promise<UserDetailsSummaryDTO[]>;
     getUserInfoByUsername(username:string):Promise<UserDetailsSummaryDTO>;
     getUserNames(prefix:string):Promise<string[]>;
+    
 }
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto";
 import { getConversationDisplay } from "../../utils/conversationDisplay";
-import { updateGroupName, updateGroupAvatar } from "../../API/userApi";
+import { updateGroupName, updateGroupAvatar } from "../../API/chatApi";
 import { useSelector } from "react-redux";
 
 type Props = {
@@ -37,11 +37,11 @@ export default function ConversationHeader({ conversation }: Props) {
       setLoading(true);
 
       if (username !== name) {
-        await updateGroupName({ groupId: _id, name: username });
+        await updateGroupName({  name: username ,createdBy},_id);
       }
 
       if (file) {
-        await updateGroupAvatar({ groupId: _id, file });
+        await updateGroupAvatar({  file,createdBy },_id);
       }
 
       setOpen(false);
@@ -69,7 +69,7 @@ export default function ConversationHeader({ conversation }: Props) {
           onClick={() => setOpen(false)}
         >
           <div
-            className="bg-white rounded-xl p-6 w-96 space-y-4"
+            className="bg-white rounded-xl p-6 sm:w-90 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col items-center gap-4">
@@ -79,7 +79,7 @@ export default function ConversationHeader({ conversation }: Props) {
               />
               <h2>{name}</h2>
               {createdBy == userData?._id && (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 w-40 sm:w-fit">
                   <label htmlFor="avatar">avatar</label>
                   <input
                     type="file"
@@ -111,7 +111,7 @@ export default function ConversationHeader({ conversation }: Props) {
           </div>
         </div>
       )}
-      ;
+      
     </>
   );
 }

@@ -6,4 +6,7 @@ export interface IConversationService {
     getUserConversations(userId: string): Promise<any>;
     updateConversationLastMessage(conversationId: string, messageId: string, messageText: string, senderId: string,createdAt:string): Promise<any>;
     // getConversationMembers(conversationId: string): Promise<any>;
+    updateGroupAvatar(userId:string,createdBy:string,groupId:string,groupAvatarFile:string):Promise<any>
+    updateGroupName(userId:string,CreatedBy:string,groupId:string,name:string):Promise<any>
+    leaveGroup(userId:string,groupId:string):Promise<any>
 }

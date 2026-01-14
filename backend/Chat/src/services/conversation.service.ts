@@ -103,15 +103,15 @@ export class ConversationService implements IConversationService {
         if (!avatarCloudinaryData) {
             throw new ApiError(500, "Failed to upload avatar on Cloudinary");
         }
-        
 
-const groupAvatar = {
-  url: avatarCloudinaryData.secure_url,
-  publicId: avatarCloudinaryData.public_id,
-};
 
-        data = {...data , groupAvatar}
-        
+        const groupAvatar = {
+            url: avatarCloudinaryData.secure_url,
+            publicId: avatarCloudinaryData.public_id,
+        };
+
+        data = { ...data, groupAvatar }
+
         const session = await mongoose.startSession();
         try {
 
@@ -172,6 +172,57 @@ const groupAvatar = {
         const updatedConversation = await this.conversationrepository.updateConversationLastMessage(conversationId, messageId, messageText, senderId, createdAt);
         return updatedConversation;
     }
+async updateGroupAvatar(
+  userId: string,
+  createdBy: string,
+  groupId: string,
+  groupAvatarFile: string
+) {
+  if (userId !== createdBy) {
+    throw new ApiError(400, "you are not authorized to change the groupAvatar");
+  }
+   if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(groupId)) {
+      throw new Error("Invalid userId or groupId");
+    }
+  if (!groupAvatarFile) {
+    throw new ApiError(400, "failed to upload groupavatar to multer");
+  }
 
+  const avatarCloudinaryData = await uploadOnCloudinary(groupAvatarFile);
+
+  if (!avatarCloudinaryData) {
+    throw new ApiError(500, "Failed to upload avatar on Cloudinary");
+  }
+
+  const groupAvatarurl = avatarCloudinaryData.secure_url;
+  const groupAvatarPublicId = avatarCloudinaryData.public_id;
+
+  const { updatedGroup, previousAvatar } =
+    await this.conversationrepository.updateGroupAvatar(
+      groupId,
+      groupAvatarurl,
+      groupAvatarPublicId
+    );
+
+  
+  if (previousAvatar?.publicId) {
+    deleteFromCloudinary(previousAvatar.publicId)
+      .catch(err => console.log("Previous avatar delete failed:", err.message));
+  }
+
+  return updatedGroup;
+}
+
+async updateGroupName(userId: string, createdBy: string, groupId: string, name: string): Promise<any> {
+    if (userId !== createdBy) {
+    throw new ApiError(400, "you are not authorized to change the group name");
+  }
+  const updateConversation = await this.conversationrepository.updatedGroupName(groupId,name)
+
+  return updateConversation
+}
+async leaveGroup(userId: string, groupId: string): Promise<any> {
+    await this.conversationrepository.leaveGroup(userId,groupId)
+}
 }
 

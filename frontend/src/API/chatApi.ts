@@ -90,15 +90,15 @@ export const createNewGroupConversation = async ({
       formData.append("groupAvatar", image);
     }
 
-   
+
     const safeMembers = Array.isArray(members) ? members : [members];
 
-formData.append("memberIds", JSON.stringify(safeMembers));
+    formData.append("memberIds", JSON.stringify(safeMembers));
     for (const pair of formData.entries()) {
-  console.log(pair[0], pair[1]);
-}
+      console.log(pair[0], pair[1]);
+    }
 
-    
+
     const res = await api.post(
       "/chat/conversations/createGroupConversation",
       formData,
@@ -128,3 +128,66 @@ formData.append("memberIds", JSON.stringify(safeMembers));
     } as ApiError;
   }
 };
+
+
+
+export const updateGroupName = async (
+  payload: {  name: string ,createdBy:string },groupId:string
+): Promise<void> => {
+  try {
+    const res = await api.patch(`/chat/conversations/updateGroupName/${groupId}`, payload);
+    return res.data.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError && error.response) {
+      throw {
+        status: error.response.status,
+        message: error.response.data.message,
+        errors: error.response.data.errors || [],
+      } as ApiError;
+    }
+
+    throw {
+      status: 500,
+      message: "Network error or server is down",
+      errors: [],
+    } as ApiError;
+  }
+}; 
+
+export const updateGroupAvatar = async (
+  payload: {  file: File; createdBy: string },groupId:string
+): Promise<ConversationListResponseDto[]> => {
+  const form = new FormData();
+  form.append("groupAvatar", payload.file);
+  form.append("createdBy", payload.createdBy);
+
+  try {
+    const res = await api.patch(
+      `/chat/conversations/updateGroupAvatar/${groupId}`,
+      form,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return res.data.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError && error.response) {
+      throw {
+        status: error.response.status,
+        message: error.response.data.message,
+        errors: error.response.data.errors || [],
+      } as ApiError;
+    }
+
+    throw {
+      status: 500,
+      message: "Network error or server is down",
+      errors: [],
+    } as ApiError;
+  }
+};
+
+

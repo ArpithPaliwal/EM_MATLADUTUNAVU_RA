@@ -87,4 +87,67 @@ export class ConversationController implements IConversationController {
 
     return res.status(200).json(new ApiResponse(200, conversations, "User conversations retrieved successfully"));
   })
+  updateGroupAvatar = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { groupId } = req.params;
+
+    const groupAvatarFile = req.file?.path;
+    const {createdBy} = req.body
+    if (!groupId) throw new ApiError(400, "No group id found");
+    if (!groupAvatarFile) throw new ApiError(400, "No avatar found");
+
+    const updatedConversation =
+      await this.conversationService.updateGroupAvatar(
+        userId,
+        createdBy,
+        groupId,
+        groupAvatarFile
+      );
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, updatedConversation, "Group avatar updated"));
+  });
+updateGroupName = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { groupId } = req.params;
+
+    
+    const {createdBy,name} = req.body
+    if (!groupId) throw new ApiError(400, "No group id found");
+    
+
+    const updatedConversation =
+      await this.conversationService.updateGroupName(
+        userId,
+        createdBy,
+        groupId,
+        name
+      );
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, updatedConversation, "Group avatar updated"));
+  });
+  leaveGroup = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { groupId } = req.params;
+
+    
+    
+    if (!groupId) throw new ApiError(400, "No group id found");
+    
+
+    const updatedConversation =
+      await this.conversationService.leaveGroup(
+        userId,
+        
+        groupId,
+        
+      );
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "Group left"));
+  });
 }

@@ -8,4 +8,7 @@ router.use(verifyJWT);
 router.route('/createGroupConversation').post(upload.single('groupAvatar'), conversationController.createGroupConversation);
 router.route('/createPrivateConversation').post(conversationController.createPrivateConversation);
 router.route('/getUserConversations').get(conversationController.getUserConversations);
-export default router;
+router.route('/updateGroupAvatar/:groupId').patch(upload.single('groupAvatar'),conversationController.updateGroupAvatar);
+router.route('/updateGroupName/:groupId').patch(conversationController.updateGroupName)
+router.route('/leaveGroup/:groupId').patch(conversationController.leaveGroup)
+export default router
