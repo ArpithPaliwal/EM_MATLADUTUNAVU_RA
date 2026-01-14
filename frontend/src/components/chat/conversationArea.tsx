@@ -10,9 +10,10 @@ import { activeConversation, inActiveConversation } from "../../Services/socket"
 type Props = {
   conversation: ConversationListResponseDto | null;
   userId: string | undefined;
+  onSelect: (conversation: ConversationListResponseDto | null) => void;
 };
 
-export default function ConversationArea({ conversation, userId }: Props) {
+export default function ConversationArea({ conversation, userId,onSelect }: Props) {
    const queryClient = useQueryClient();
   useEffect(() => {
   if (!conversation) return;
@@ -60,8 +61,9 @@ export default function ConversationArea({ conversation, userId }: Props) {
 
 
   return (
+
     <div className="flex flex-col h-full min-h-0  ">
-      <ConversationHeader conversation={conversation} />
+      <ConversationHeader conversation={conversation} onSelect={onSelect}/>
 
       <div className="flex-1 overflow-y-auto px-3 py-2 min-h-0">
         <MessageList conversationId={conversation._id} />

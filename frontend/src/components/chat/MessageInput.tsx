@@ -3,6 +3,8 @@ import { sendMessage } from "../../Services/socket";
 import { useUploadMessageFile } from "../../hooks/useUploadMessageFile";
 import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import type { MessagePage, MessageResponseDto } from "../../dto/messages.dto";
+import {ImagePlus} from "../../assets/icons/index"
+import { useRef } from "react";
 
 type Props = { conversationId: string; senderId: string | undefined };
 
@@ -10,6 +12,8 @@ export default function MessageInput({ conversationId, senderId }: Props) {
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
+
+const fileRef = useRef<HTMLInputElement>(null);
   const uploadMutation = useUploadMessageFile();
   const queryClient = useQueryClient();
 
@@ -48,6 +52,7 @@ export default function MessageInput({ conversationId, senderId }: Props) {
   //     }
   //   );
   // }
+
   function rollback(tempId: string) {
     queryClient.setQueryData(
       ["messages", conversationId],
@@ -222,15 +227,21 @@ export default function MessageInput({ conversationId, senderId }: Props) {
   return (
     <div className="flex items-center gap-2 p-2 bg-third rounded-xl w-[88vw] sm:w-full">
       <input
+        ref={fileRef}
         type="file"
         accept="image/*,video/*"
         name="userUploadedMediaFile"
         onChange={(e) => setFile(e.target.files?.[0] || null)}
-        className="w-9"
+        className="hidden"
       />
+      <ImagePlus
+      className="text-white cursor-pointer bg-secondary rounded-full p-1"
+      size={35}
+      onClick={() => fileRef.current?.click()}
+    />
 
       <input
-        className="w-full border rounded-xl px-3 py-2"
+        className="w-full border rounded-xl px-3 py-2 "
         placeholder="Type a message…"
         value={text}
         onChange={(e) => setText(e.target.value)}

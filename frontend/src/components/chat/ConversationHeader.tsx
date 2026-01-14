@@ -3,9 +3,10 @@ import type { ConversationListResponseDto } from "../../dto/chatListResponse.dto
 import { getConversationDisplay } from "../../utils/conversationDisplay";
 import { updateGroupName, updateGroupAvatar } from "../../API/chatApi";
 import { useSelector } from "react-redux";
-
+import {ArrowLeft} from "../../assets/icons/index"
 type Props = {
   conversation: ConversationListResponseDto;
+  onSelect: (conversation: ConversationListResponseDto | null) => void;
 };
 
 type UserData = {
@@ -21,7 +22,7 @@ type AuthState = {
 type AppState = {
   auth: AuthState;
 };
-export default function ConversationHeader({ conversation }: Props) {
+export default function ConversationHeader({ conversation,onSelect }: Props) {
   const userData = useSelector((state: AppState) => state.auth.userData);
   const { name, avatar } = getConversationDisplay(conversation);
   const type = conversation.type;
@@ -49,19 +50,24 @@ export default function ConversationHeader({ conversation }: Props) {
       setLoading(false);
     }
   };
-
+  
   return (
     <>
+    
+      <div className="flex items-center w-full">
+        <div className="sm:hidden bg-third rounded-full p-2"onClick={()=>onSelect(null)}> <ArrowLeft className="text-primary" size={24}/> </div>
       <div
         onClick={() => type === "group" && setOpen(true)}
-        className="flex items-center gap-3 h-16 px-4 rounded-xl bg-third w-[88vw] sm:w-full cursor-pointer"
+        className="flex items-center gap-3 h-16 px-4 rounded-xl bg-third w-full  sm:w-full cursor-pointer"
       >
+        
         <img
           src={avatar}
           alt={name}
           className="w-10 h-10 rounded-full object-cover"
         />
         <span className="font-semibold text-gray-900">{name}</span>
+      </div>
       </div>
       {open && (
         <div

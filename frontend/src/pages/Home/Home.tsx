@@ -117,6 +117,7 @@ function Home() {
         >
           <ConversationArea
             conversation={selectedChat}
+            onSelect={setSelectedChat}
             userId={userData?._id}
           />
         </div>
