@@ -39,15 +39,16 @@ socket.on("connect_error", (err) => {
 });
 
 // ---- Controls ----
-export const connectSocket = () => {
+export const connectSocket = (): void => {
   if (!socket.connected) {
     socket.connect();
   }
 };
 
-export const disconnectSocket = () => {
+export const disconnectSocket = (): void => {
   if (socket.connected) socket.disconnect();
 };
+
 
 // ---- Conversation ----
 export const joinConversations = (conversationIds: string[]) => {
@@ -79,14 +80,14 @@ export const inActiveConversation = (conversationId: string) => {
 // ---- Message listeners ----
 export const onMessageNew = (cb: (msg: MessageResponseDto) => void) => {
   socket.on("message:new", cb);
-  return () => socket.off("message:new", cb);
+  return () => {socket.off("message:new", cb)}
 };
 
 export const onMessageDeleted = (
   cb: (payload: { messageId: string }) => void
 ) => {
   socket.on("message:deleted", cb);
-  return () => socket.off("message:deleted", cb);
+  return () => {socket.off("message:deleted", cb)}
 };
 
 // ---- Message actions ----
@@ -126,6 +127,7 @@ export const resetUnread = (conversationParticipantId?: string) => {
   socket.emit("conversationParticipant:unreadCount", conversationParticipantId);
 };
 
+
 export const onUnreadUpdate = (
   cb: (payload: {
     conversationId: string;
@@ -134,5 +136,8 @@ export const onUnreadUpdate = (
   }) => void
 ) => {
   socket.on("conversation:unreadUpdate", cb);
-  return () => socket.off("conversation:unreadUpdate", cb);
+
+  return () => {
+    socket.off("conversation:unreadUpdate", cb);
+  };
 };
