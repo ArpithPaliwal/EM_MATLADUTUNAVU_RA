@@ -9,9 +9,7 @@ export const getConversationsList = async (): Promise<
   try {
     console.log("sent succe");
 
-    const res = await api.get("/chat/conversations/getUserConversations", {
-      withCredentials: true,
-    });
+    const res = await api.get("/chat/conversations/getUserConversations");
     console.log("check");
 
     console.log(res);
@@ -46,8 +44,7 @@ export const createNewPrivateConversation = async ({
 
     const res = await api.post(
       "/chat/conversations/createPrivateConversation",
-      { memberUsername },
-      { withCredentials: true }
+      { memberUsername }
     );
     console.log("check");
 
@@ -101,13 +98,8 @@ export const createNewGroupConversation = async ({
 
     const res = await api.post(
       "/chat/conversations/createGroupConversation",
-      formData,
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      formData
+      
     );
 
     return res.data.data;
@@ -164,12 +156,7 @@ export const updateGroupAvatar = async (
   try {
     const res = await api.patch(
       `/chat/conversations/updateGroupAvatar/${groupId}`,
-      form,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      form
     );
 
     return res.data.data;

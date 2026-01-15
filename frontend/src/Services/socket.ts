@@ -1,16 +1,22 @@
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import type { MessageResponseDto } from "../dto/messages.dto";
 
-export const socket: Socket = io(
-  import.meta.env.VITE_API_BASE_CHAT_SOCKET as string,
-  {
-    withCredentials: true,
-    autoConnect: false,
-    // auth: {
-    //   token: localStorage.getItem("accessToken"),
-    // },
-  }
-);
+// export const socket: Socket = io(
+//   import.meta.env.VITE_API_BASE_CHAT_SOCKET as string,
+//   {
+//     withCredentials: true,
+//     autoConnect: false,
+//     // auth: {
+//     //   token: localStorage.getItem("accessToken"),
+//     // },
+//   }
+// );
+export const socket = io(import.meta.env.VITE_API_BASE_CHAT_SOCKET, {
+  withCredentials: true,
+  transports: ["websocket", "polling"],
+  autoConnect: false,
+});
+
 let pendingConversationIds: string[] = [];
 let lastActiveConversation: string | null = null;
 

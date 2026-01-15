@@ -9,8 +9,9 @@ import { createFormData } from "../utils/createFormData.js";
 export const  getMessages= async (conversationId:string,cursor:string | null ):Promise<MessagePage> =>{
     try {
       console.log("sent succe");
-      
-         const res = await api.get(`/chat/messages/getMessages/${conversationId}?cursor=${cursor || ""}`, { withCredentials: true});
+        const query = cursor ? `?cursor=${cursor}` : "";
+
+         const res = await api.get(`/chat/messages/getMessages/${conversationId}${query}`);
       console.log("check");
     
     console.log(res);
@@ -52,7 +53,7 @@ export const uploadMedia = async (
   const res = await api.post(
     "/chat/messages/sendMessage",
     form,
-    { withCredentials: true }
+    
   );
   console.log("returned data",res.data.data);
   

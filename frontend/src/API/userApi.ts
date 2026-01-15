@@ -7,7 +7,7 @@ export const initiateRegisterUser = async (formData: FormData): Promise<void> =>
   try {
     console.log("sent succe");
 
-    const res = await api.post("/users/signupInitialize", formData, { withCredentials: true });
+    const res = await api.post("/users/signupInitialize", formData);
     console.log("check");
 
     console.log(res);
@@ -41,7 +41,7 @@ type SubmitOtpPayload = {
 
 export const submitOtp = async ({ email, otpValue }: SubmitOtpPayload): Promise<RegisterResponseDto> => {
   try {
-    const res = await api.post("/users/signupVerifyCode", { otp: otpValue, email }, { withCredentials: true });
+    const res = await api.post("/users/signupVerifyCode", { otp: otpValue, email });
 
     console.log("check");
 
