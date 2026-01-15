@@ -89,6 +89,8 @@ export class AuthController implements IAuthController {
         httpOnly: true,
         secure: true,
         sameSite: "none",
+        // secure: false,
+        // sameSite: "lax",
         path: '/'
       });
 
