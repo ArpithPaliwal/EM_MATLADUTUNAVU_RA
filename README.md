@@ -18,11 +18,6 @@ The backend is built on a microservices architecture to ensure 📈 scalability 
 *   📧 **Mail Service**: An asynchronous worker that handles sending emails, such as OTPs for user verification, by consuming messages from a RabbitMQ queue.
 
 Communication between services is handled through REST APIs 🔁 for synchronous requests (e.g., Chat Service fetching user details from User Service) and RabbitMQ 🐇 for asynchronous event-driven tasks (e.g., User Service publishing a mail-sending event).
-## 🛠️ Tech Stack
-
-**Client:** ⚛️ React, 🧰 Redux, 🎨 TailwindCSS  
-
-**Server:** 🟢 Node, 🚀 Express  
 
 ---
 
