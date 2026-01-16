@@ -125,7 +125,7 @@ export const updateUsername = async (
   username: string
 ): Promise<{username:string}> => {
   try {
-    const res = await api.patch("/users/updateUsername", { username });
+    const res = await api.patch("/users/updateUsername", { username },{ withCredentials: true });
     return res.data.data;
   } catch (error: unknown) {
     if (error instanceof AxiosError && error.response) {

@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import { ApiError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from 'jsonwebtoken';
@@ -8,7 +11,10 @@ export const verifyJWT = asyncHandler(
         if (!accessToken) { 
             throw new ApiError(401, "Access token is missing");
         }   
-        const decoded = jwt.verify(accessToken, process.env.JWT_ACCESS_TOKEN_SECRET as string);
+        
+        
+        const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string);
+        
         req.user = decoded;
         next();
     } catch (error) {

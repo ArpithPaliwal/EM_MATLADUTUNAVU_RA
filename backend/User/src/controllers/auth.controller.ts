@@ -143,6 +143,7 @@ export class AuthController implements IAuthController {
   async (req: Request, res: Response): Promise<Response> => {
 
     const userId = req.user?._id;
+    console.log("userid in avatar ",userId)
     const avatarLocalPath: string | undefined = req.file?.path;
 
     try {
