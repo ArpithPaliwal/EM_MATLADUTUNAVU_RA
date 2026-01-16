@@ -245,4 +245,10 @@ export class AuthController implements IAuthController {
       )
     } 
   )
+  refreshToken = asyncHandler(async (req: Request, res: Response): Promise<Response> =>{
+    
+    return res.status(200).json(
+        new ApiResponse(200,  usernames , "refresh token sent  successfully")
+      )
+  })
 }

@@ -11,5 +11,5 @@ export interface IAuthController {
   getUserInBulk: RequestHandler;
   getUserInfoByUsername:RequestHandler;
   getUserNames:RequestHandler
-  
+  refreshToken:RequestHandler
 }
